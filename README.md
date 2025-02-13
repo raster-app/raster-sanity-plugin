@@ -13,11 +13,11 @@ A Sanity Studio plugin that integrates [Raster](https://raster.app) - a modern D
 ## Installation
 
 ```bash
-npm install @monogram/sanity-plugin-raster
+npm install @raster-app/sanity-plugin-raster
 # or
-yarn add @monogram/sanity-plugin-raster
+yarn add @raster-app/sanity-plugin-raster
 # or
-pnpm add @monogram/sanity-plugin-raster
+pnpm add @raster-app/sanity-plugin-raster
 ```
 
 ## Configuration
@@ -33,7 +33,7 @@ pnpm add @monogram/sanity-plugin-raster
 ```typescript
 // sanity.config.ts
 import { defineConfig } from "sanity";
-import { rasterPlugin } from "@monogram/sanity-plugin-raster";
+import { rasterPlugin } from "@raster-app/sanity-plugin-raster";
 
 export default defineConfig({
   // ...other config
@@ -131,7 +131,7 @@ function BlogPost({ post }) {
    pnpm link-watch
 
    # In your Sanity studio directory
-   pnpm yalc add @monogram/sanity-plugin-raster
+   pnpm yalc add @raster-app/sanity-plugin-raster
    pnpm install
    ```
 

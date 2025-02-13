@@ -5,7 +5,7 @@
   },
   "parts": [
     {
-      "name": "part:@monogram/sanity-plugin-raster",
+      "name": "part:@raster-app/sanity-plugin-raster",
       "implements": "part:@sanity/form-builder/input/file",
       "path": "index"
     }
