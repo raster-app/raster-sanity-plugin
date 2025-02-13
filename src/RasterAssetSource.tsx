@@ -60,7 +60,8 @@ export function RasterAssetSource(props: RasterAssetSourceProps) {
           onClose={() => setShowPicker(false)}
           width={4}
           position="fixed"
-          style={{ height: "90vh" }}
+          zOffset={99999999}
+          style={{ height: "90vh", marginTop: "40px" }}
         >
           <Box padding={4} style={{ height: "100%" }}>
             <div style={pickerStyles.content}>

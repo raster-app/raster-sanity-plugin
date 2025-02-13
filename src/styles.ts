@@ -17,7 +17,6 @@ export const pickerStyles = {
     display: "flex",
     gap: "2rem",
     height: "calc(100% - 60px)",
-    overflow: "hidden",
   },
   previewContainer: {
     display: "flex",
