@@ -23,6 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
-# Cursor
-.cursor
+# Yalc
+.yalc
+yalc.lock
+
+# Other
 plugin-examples

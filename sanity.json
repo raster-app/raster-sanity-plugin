@@ -1,0 +1,13 @@
+{
+  "paths": {
+    "source": "./src",
+    "compiled": "./dist"
+  },
+  "parts": [
+    {
+      "name": "part:@monogram/sanity-plugin-raster",
+      "implements": "part:@sanity/form-builder/input/file",
+      "path": "index"
+    }
+  ]
+}

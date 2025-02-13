@@ -1,29 +1,67 @@
 {
-  "name": "raster-sanity-plugin",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@monogram/sanity-plugin-raster",
+  "private": false,
+  "version": "1.0.0",
   "type": "module",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.cjs.js",
+      "default": "./dist/index.es.js"
+    }
+  },
+  "files": [
+    "dist",
+    "sanity.json"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "sanity",
+    "sanity-plugin",
+    "raster",
+    "dam",
+    "asset-source"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "watch": "vite build --watch",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "link-watch": "plugin-kit link-watch",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@sanity/ui": "^1.9.3",
+    "@sanity/icons": "^2.8.0",
+    "styled-components": "^6.1.8",
+    "@raster-app/raster-toolkit": "latest"
+  },
+  "peerDependencies": {
+    "sanity": "^3.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
-    "@types/react": "^19.0.8",
-    "@types/react-dom": "^19.0.3",
+    "@types/node": "^20.11.17",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.19.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
     "globals": "^15.14.0",
-    "typescript": "~5.7.2",
+    "typescript": "~5.3.3",
     "typescript-eslint": "^8.22.0",
-    "vite": "^6.1.0"
+    "vite": "^5.1.0",
+    "sanity": "^3.27.1",
+    "@sanity/plugin-kit": "^3.1.10"
   }
 }
