@@ -1,4 +1,4 @@
-# Sanity Plugin - Raster Asset Source
+# Sanity Plugin - Raster
 
 A Sanity Studio plugin that integrates [Raster](https://raster.app) - a modern Digital Asset Management (DAM) platform that helps teams organize, optimize, and deliver their media assets with powerful AI features and an intuitive interface.
 
