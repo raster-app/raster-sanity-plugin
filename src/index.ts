@@ -1,11 +1,9 @@
 import { definePlugin, type AssetSource } from "sanity";
 import { RasterAssetSource } from "./RasterAssetSource";
 import React from "react";
+import { RasterConfig } from "./types";
 
-interface RasterConfig {
-  apiKey: string;
-  orgId: string;
-}
+export * from "./types";
 
 export const rasterAssetSource = definePlugin<RasterConfig>((config) => {
   const rasterSource: AssetSource = {
