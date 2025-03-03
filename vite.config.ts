@@ -7,13 +7,14 @@ export default defineConfig({
   plugins: [
     react(),
     dts({
+      rollupTypes: true,
       insertTypesEntry: true,
       exclude: ["**/*.test.ts", "**/*.test.tsx"],
     }),
   ],
   build: {
     lib: {
-      entry: resolve(__dirname, "src/index.ts"),
+      entry: resolve(__dirname, "src/index.tsx"),
       name: "RasterSanityPlugin",
       fileName: (format) => `index.${format}.js`,
       formats: ["es", "cjs"],
@@ -22,6 +23,7 @@ export default defineConfig({
       external: [
         "react",
         "react-dom",
+        "react/jsx-runtime",
         "sanity",
         "@sanity/ui",
         "@sanity/icons",
@@ -32,6 +34,7 @@ export default defineConfig({
         globals: {
           react: "React",
           "react-dom": "ReactDOM",
+          "react/jsx-runtime": "jsxRuntime",
           sanity: "Sanity",
           "@sanity/ui": "SanityUI",
           "@sanity/icons": "SanityIcons",

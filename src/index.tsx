@@ -1,7 +1,7 @@
 import { definePlugin, type AssetSource } from "sanity";
 import { RasterAssetSource } from "./RasterAssetSource";
-import React from "react";
 import { RasterConfig } from "./types";
+import React from "react";
 
 export * from "./types";
 
@@ -9,8 +9,7 @@ export const rasterAssetSource = definePlugin<RasterConfig>((config) => {
   const rasterSource: AssetSource = {
     name: "raster",
     title: "Raster",
-    component: (props) =>
-      React.createElement(RasterAssetSource, { ...props, config }),
+    component: (props) => <RasterAssetSource {...props} config={config} />,
     icon: () => null,
   };
 

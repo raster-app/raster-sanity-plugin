@@ -1,7 +1,7 @@
 {
   "name": "@raster-app/sanity-plugin-raster",
   "private": false,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "main": "./dist/index.cjs.js",
   "module": "./dist/index.es.js",
@@ -46,8 +46,8 @@
   },
   "peerDependencies": {
     "@sanity/ui": "^1.0 || ^2.0",
-    "react": "^18",
-    "react-dom": "^18",
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19",
     "sanity": "^3.0.0",
     "styled-components": "^5.0 || ^6.0"
   },
