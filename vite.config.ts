@@ -19,11 +19,13 @@ export default defineConfig({
       fileName: (format) => `index.${format}.js`,
       formats: ["es", "cjs"],
     },
+    sourcemap: true,
+    minify: false,
     rollupOptions: {
       external: [
         "react",
-        "react-dom",
         "react/jsx-runtime",
+        "react-dom",
         "sanity",
         "@sanity/ui",
         "@sanity/icons",
@@ -33,8 +35,8 @@ export default defineConfig({
       output: {
         globals: {
           react: "React",
-          "react-dom": "ReactDOM",
           "react/jsx-runtime": "jsxRuntime",
+          "react-dom": "ReactDOM",
           sanity: "Sanity",
           "@sanity/ui": "SanityUI",
           "@sanity/icons": "SanityIcons",
