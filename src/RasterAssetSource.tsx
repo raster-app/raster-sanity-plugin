@@ -1,5 +1,4 @@
-import { Box, Button, Card, Dialog, Stack, Text } from "@sanity/ui";
-import { ImageIcon } from "@sanity/icons";
+import { Box, Button, Card, Dialog, Text } from "@sanity/ui";
 import {
   RasterImages,
   RasterLibraries,
@@ -12,7 +11,6 @@ import { pickerStyles } from "./styles";
 
 export function RasterAssetSource(props: RasterAssetSourceProps) {
   const { onSelect, config } = props;
-  const [showPicker, setShowPicker] = React.useState(false);
   const { count, images: selectedPhotos } = useSelectedImages();
 
   const handleConfirm = React.useCallback(() => {
@@ -24,8 +22,8 @@ export function RasterAssetSource(props: RasterAssetSourceProps) {
     }));
 
     onSelect(assets);
-    setShowPicker(false);
-  }, [onSelect, selectedPhotos]);
+    props.onClose();
+  }, [onSelect, selectedPhotos, props]);
 
   if (!config.apiKey || !config.orgId) {
     return (
@@ -36,60 +34,40 @@ export function RasterAssetSource(props: RasterAssetSourceProps) {
   }
 
   return (
-    <>
-      <Card padding={4}>
-        <Stack space={4}>
-          <Text size={2} weight="semibold">
-            Select from Raster
-          </Text>
-          <Box>
-            <Button
-              icon={ImageIcon}
-              mode="ghost"
-              onClick={() => setShowPicker(true)}
-              text="Browse Raster Assets"
+    <Dialog
+      header="Select images from Raster"
+      id="raster-asset-picker"
+      onClose={props.onClose}
+      width={4}
+      position="fixed"
+      zOffset={99999999}
+      style={{ height: "96vh", marginTop: "40px" }}
+    >
+      <Box padding={4} style={{ height: "100%" }}>
+        <div style={pickerStyles.content}>
+          <RasterLibraries config={config} />
+          <div style={pickerStyles.previewContainer}>
+            <RasterPreview
+              config={config}
+              initialValue={null}
+              showBorder={false}
             />
-          </Box>
-        </Stack>
-      </Card>
+            <hr style={pickerStyles.divider} />
+            <RasterImages config={config} isSingleImage />
+          </div>
+        </div>
 
-      {showPicker && (
-        <Dialog
-          header="Select images from Raster"
-          id="raster-asset-picker"
-          onClose={() => setShowPicker(false)}
-          width={4}
-          position="fixed"
-          zOffset={99999999}
-          style={{ height: "90vh", marginTop: "40px" }}
-        >
-          <Box padding={4} style={{ height: "100%" }}>
-            <div style={pickerStyles.content}>
-              <RasterLibraries config={config} />
-              <div style={pickerStyles.previewContainer}>
-                <RasterPreview config={config} initialValue={null} />
-                <hr style={pickerStyles.divider} />
-                <RasterImages config={config} />
-              </div>
-            </div>
-
-            <Box style={pickerStyles.footer}>
-              <Button
-                mode="ghost"
-                onClick={() => setShowPicker(false)}
-                text="Cancel"
-              />
-              {count > 0 && (
-                <Button
-                  tone="positive"
-                  onClick={handleConfirm}
-                  text={`Confirm (${count})`}
-                />
-              )}
-            </Box>
-          </Box>
-        </Dialog>
-      )}
-    </>
+        <Box style={pickerStyles.footer}>
+          <Button mode="ghost" onClick={props.onClose} text="Cancel" />
+          {count > 0 && (
+            <Button
+              tone="positive"
+              onClick={handleConfirm}
+              text={`Confirm (${count})`}
+            />
+          )}
+        </Box>
+      </Box>
+    </Dialog>
   );
 }
