@@ -1,7 +1,7 @@
 {
   "name": "@raster-app/sanity-plugin-raster",
   "private": false,
-  "version": "1.0.5",
+  "version": "1.0.6",
   "type": "module",
   "main": "./dist/index.cjs.js",
   "module": "./dist/index.es.js",
@@ -41,8 +41,10 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "@raster-app/raster-toolkit": "0.0.9",
-    "@sanity/icons": "^2.8.0"
+    "@raster-app/raster-toolkit": "0.0.11",
+    "@sanity/icons": "^2.8.0",
+    "use-sync-external-store": "^1.4.0",
+    "immer": "^10.1.1"
   },
   "peerDependencies": {
     "@sanity/ui": "^1.0 || ^2.0",

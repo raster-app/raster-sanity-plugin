@@ -9,14 +9,17 @@ importers:
   .:
     dependencies:
       '@raster-app/raster-toolkit':
-        specifier: 0.0.9
-        version: 0.0.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 0.0.11
+        version: 0.0.11(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.4.0(react@18.3.1))
       '@sanity/icons':
         specifier: ^2.8.0
         version: 2.11.8(react@18.3.1)
       '@sanity/ui':
         specifier: ^1.0 || ^2.0
         version: 2.14.5(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react-is@18.3.1)(react@18.3.1)(styled-components@6.1.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
+      immer:
+        specifier: ^10.1.1
+        version: 10.1.1
       react:
         specifier: ^18 || ^19
         version: 18.3.1
@@ -26,6 +29,9 @@ importers:
       styled-components:
         specifier: ^5.0 || ^6.0
         version: 6.1.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      use-sync-external-store:
+        specifier: ^1.4.0
+        version: 1.4.0(react@18.3.1)
     devDependencies:
       '@eslint/js':
         specifier: ^9.19.0
@@ -1561,11 +1567,13 @@ packages:
     resolution: {integrity: sha512-5xk5MSyQU9CrDho3Rsguj38jhijhD36Mk8S6mZo3huv6PM+t4M/5kJN2KFIxgvt4ONpvOEs1pVIZAV0cL0Vi+Q==}
     engines: {node: ^14.13.1 || >=16.0.0 || >=18.0.0}
 
-  '@raster-app/raster-toolkit@0.0.9':
-    resolution: {integrity: sha512-WrBTtNF8SF39MamSg3RjERJ1r3jrzBtoK2V8uCTPfeLehGTQ08S9V3mxXCCDCpd6lJxEEGV7BsmFNpiIBxqoQg==}
+  '@raster-app/raster-toolkit@0.0.11':
+    resolution: {integrity: sha512-1O7vyx9Ygl1R6dDzwqkGXcUaRlbSf17L1hknvw1Pawakz89nKF/d60sI11WEeQCAzqrjj5VJRwNps23JETc+Fg==}
     peerDependencies:
+      immer: ^10.1.1
       react: ^18 || ^19
       react-dom: ^18 || ^19
+      use-sync-external-store: ^1.4.0
 
   '@rexxars/choosealicense-list@1.1.2':
     resolution: {integrity: sha512-f/md1BnJVWslL8B1px+KlMIa2a5OdKb4miZA4EYHl4lsbFh4pZ/SFt0Dko0Vmg1TjTvw7m1dDJ33wyVwa44A1g==}
@@ -5498,19 +5506,22 @@ packages:
   zod@3.24.2:
     resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
 
-  zustand@4.5.6:
-    resolution: {integrity: sha512-ibr/n1hBzLLj5Y+yUcU7dYw8p6WnIVzdJbnX+1YpaScvZVF2ziugqHs+LAmHw4lWO9c/zRj+K1ncgWDQuthEdQ==}
-    engines: {node: '>=12.7.0'}
+  zustand@5.0.3:
+    resolution: {integrity: sha512-14fwWQtU3pH4dE0dOpdMiWjddcH+QzKIgk1cl8epwSE7yag43k/AD/m4L6+K7DytAOr9gGBe3/EXj9g7cdostg==}
+    engines: {node: '>=12.20.0'}
     peerDependencies:
-      '@types/react': '>=16.8'
+      '@types/react': '>=18.0.0'
       immer: '>=9.0.6'
-      react: '>=16.8'
+      react: '>=18.0.0'
+      use-sync-external-store: '>=1.2.0'
     peerDependenciesMeta:
       '@types/react':
         optional: true
       immer:
         optional: true
       react:
+        optional: true
+      use-sync-external-store:
         optional: true
 
 snapshots:
@@ -6976,19 +6987,20 @@ snapshots:
 
   '@portabletext/types@2.0.13': {}
 
-  '@raster-app/raster-toolkit@0.0.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@raster-app/raster-toolkit@0.0.11(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(use-sync-external-store@1.4.0(react@18.3.1))':
     dependencies:
       '@dnd-kit/core': 6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@dnd-kit/sortable': 8.0.0(@dnd-kit/core@6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@sentry/react': 9.3.0(react@18.3.1)
       '@tanstack/react-query': 5.67.1(react@18.3.1)
       clsx: 2.1.1
+      immer: 10.1.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      zustand: 4.5.6(@types/react@18.3.18)(immer@10.1.1)(react@18.3.1)
+      use-sync-external-store: 1.4.0(react@18.3.1)
+      zustand: 5.0.3(@types/react@18.3.18)(immer@10.1.1)(react@18.3.1)(use-sync-external-store@1.4.0(react@18.3.1))
     transitivePeerDependencies:
       - '@types/react'
-      - immer
 
   '@rexxars/choosealicense-list@1.1.2': {}
 
@@ -11479,10 +11491,9 @@ snapshots:
 
   zod@3.24.2: {}
 
-  zustand@4.5.6(@types/react@18.3.18)(immer@10.1.1)(react@18.3.1):
-    dependencies:
-      use-sync-external-store: 1.4.0(react@18.3.1)
+  zustand@5.0.3(@types/react@18.3.18)(immer@10.1.1)(react@18.3.1)(use-sync-external-store@1.4.0(react@18.3.1)):
     optionalDependencies:
       '@types/react': 18.3.18
       immer: 10.1.1
       react: 18.3.1
+      use-sync-external-store: 1.4.0(react@18.3.1)
