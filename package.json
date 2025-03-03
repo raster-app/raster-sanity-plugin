@@ -1,7 +1,7 @@
 {
   "name": "@raster-app/sanity-plugin-raster",
   "private": false,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "main": "./dist/index.cjs.js",
   "module": "./dist/index.es.js",
@@ -33,7 +33,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build && cp src/index.d.ts dist/index.d.ts",
     "watch": "vite build --watch",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -41,17 +41,15 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "@sanity/ui": "^1.9.3",
     "@sanity/icons": "^2.8.0",
-    "styled-components": "^6.1.8",
     "@raster-app/raster-toolkit": "latest"
   },
   "peerDependencies": {
+    "react": "^18",
+    "react-dom": "^18",
     "sanity": "^3.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "@sanity/ui": "^1.0 || ^2.0",
+    "styled-components": "^5.0 || ^6.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
