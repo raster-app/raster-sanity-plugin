@@ -1,16 +1,15 @@
 import { definePlugin, type AssetSource } from "sanity";
-import { RasterAssetSourceWrapper } from "./RasterAssetSourceWrapper";
+import { RasterAssetSource } from "./RasterAssetSource";
 import { RasterConfig } from "./types";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export * from "./types";
 
 export const rasterAssetSource = definePlugin<RasterConfig>((config) => {
   const rasterSource: AssetSource = {
     name: "raster",
     title: "Raster",
-    component: (props) => (
-      <RasterAssetSourceWrapper {...props} config={config} />
-    ),
+    component: (props) => <RasterAssetSource {...props} config={config} />,
     icon: () => null,
   };
 
