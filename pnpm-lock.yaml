@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@raster-app/raster-toolkit':
-        specifier: 0.0.8
-        version: 0.0.8(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 0.0.9
+        version: 0.0.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@sanity/icons':
         specifier: ^2.8.0
         version: 2.11.8(react@18.3.1)
@@ -1561,11 +1561,11 @@ packages:
     resolution: {integrity: sha512-5xk5MSyQU9CrDho3Rsguj38jhijhD36Mk8S6mZo3huv6PM+t4M/5kJN2KFIxgvt4ONpvOEs1pVIZAV0cL0Vi+Q==}
     engines: {node: ^14.13.1 || >=16.0.0 || >=18.0.0}
 
-  '@raster-app/raster-toolkit@0.0.8':
-    resolution: {integrity: sha512-wgf1RYzEnAKUIlIQsa2NIJYzIqHn3LhE7F6rn+HzQ2ReBLpLzlA3qOK9AW8pQDi1CHQNmE51ywbgUsEmJGHskw==}
+  '@raster-app/raster-toolkit@0.0.9':
+    resolution: {integrity: sha512-WrBTtNF8SF39MamSg3RjERJ1r3jrzBtoK2V8uCTPfeLehGTQ08S9V3mxXCCDCpd6lJxEEGV7BsmFNpiIBxqoQg==}
     peerDependencies:
-      react: ^18
-      react-dom: ^18
+      react: ^18 || ^19
+      react-dom: ^18 || ^19
 
   '@rexxars/choosealicense-list@1.1.2':
     resolution: {integrity: sha512-f/md1BnJVWslL8B1px+KlMIa2a5OdKb4miZA4EYHl4lsbFh4pZ/SFt0Dko0Vmg1TjTvw7m1dDJ33wyVwa44A1g==}
@@ -6976,7 +6976,7 @@ snapshots:
 
   '@portabletext/types@2.0.13': {}
 
-  '@raster-app/raster-toolkit@0.0.8(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@raster-app/raster-toolkit@0.0.9(@types/react@18.3.18)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@dnd-kit/core': 6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@dnd-kit/sortable': 8.0.0(@dnd-kit/core@6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
