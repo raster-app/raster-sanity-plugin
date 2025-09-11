@@ -25,23 +25,19 @@ export default defineConfig({
         "react-dom",
         "react/jsx-runtime",
         "sanity",
-        "@sanity/ui",
-        "@sanity/icons",
         "styled-components",
         "@raster-app/raster-toolkit",
       ],
-      output: {
-        globals: {
-          react: "React",
-          "react-dom": "ReactDOM",
-          "react/jsx-runtime": "jsxRuntime",
-          sanity: "Sanity",
-          "@sanity/ui": "SanityUI",
-          "@sanity/icons": "SanityIcons",
-          "styled-components": "styled",
-          "@raster-app/raster-toolkit": "RasterToolkit",
+      output: [
+        {
+          format: "es",
+          exports: "named",
         },
-      },
+        {
+          format: "cjs",
+          exports: "named",
+        },
+      ],
     },
     sourcemap: true,
     minify: false,

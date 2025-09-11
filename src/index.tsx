@@ -7,7 +7,7 @@ import { RasterTool } from "./RasterTool";
 // eslint-disable-next-line react-refresh/only-export-components
 export * from "./types";
 
-export const rasterAssetSource = definePlugin<RasterConfig>((config) => {
+export const rasterPlugin = definePlugin<RasterConfig>((config) => {
   const rasterSource: AssetSource = {
     name: "raster",
     title: "Raster",
