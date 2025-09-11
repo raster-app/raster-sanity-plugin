@@ -1,11 +1,13 @@
 import { Box, Card, Text } from "@sanity/ui";
-import {
-  RasterImages,
-  RasterLibraries,
-  RasterPreview,
-} from "@raster-app/raster-toolkit";
+import React, { Suspense } from "react";
 import { type RasterToolProps } from "./types";
-import { pickerStyles } from "./styles";
+
+// Lazy wrapper component to avoid Node.js issues during schema extraction
+const RasterToolContent = React.lazy(() =>
+  import("./RasterToolContent").catch(() => ({
+    default: () => <div>Loading...</div>,
+  }))
+);
 
 export function RasterTool(props: RasterToolProps) {
   const { config } = props;
@@ -20,14 +22,9 @@ export function RasterTool(props: RasterToolProps) {
 
   return (
     <Box padding={4} style={{ height: "100%" }}>
-      <div style={pickerStyles.content}>
-        <RasterLibraries config={config} />
-        <div style={pickerStyles.previewContainer}>
-          <RasterPreview config={config} initialValue={null} />
-          <hr style={pickerStyles.divider} />
-          <RasterImages config={config} />
-        </div>
-      </div>
+      <Suspense fallback={<div>Loading Raster components...</div>}>
+        <RasterToolContent {...props} />
+      </Suspense>
     </Box>
   );
 }

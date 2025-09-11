@@ -1,29 +1,16 @@
-import { Box, Button, Card, Dialog, Text } from "@sanity/ui";
-import {
-  RasterImages,
-  RasterLibraries,
-  RasterPreview,
-  useSelectedImages,
-} from "@raster-app/raster-toolkit";
-import React from "react";
+import { Box, Card, Dialog, Text } from "@sanity/ui";
+import React, { Suspense } from "react";
 import { type RasterAssetSourceProps } from "./types";
-import { pickerStyles } from "./styles";
+
+// Lazy wrapper component to avoid Node.js issues during schema extraction
+const RasterPickerContent = React.lazy(() =>
+  import("./RasterPickerContent").catch(() => ({
+    default: () => <div>Loading...</div>,
+  }))
+);
 
 export function RasterAssetSource(props: RasterAssetSourceProps) {
-  const { onSelect, config } = props;
-  const { count, images: selectedPhotos } = useSelectedImages();
-
-  const handleConfirm = React.useCallback(() => {
-    if (!selectedPhotos) return;
-
-    const assets = selectedPhotos.map((image) => ({
-      kind: "url" as const,
-      value: image.url,
-    }));
-
-    onSelect(assets);
-    props.onClose();
-  }, [onSelect, selectedPhotos, props]);
+  const { config } = props;
 
   if (!config.apiKey || !config.orgId) {
     return (
@@ -44,29 +31,9 @@ export function RasterAssetSource(props: RasterAssetSourceProps) {
       style={{ height: "96vh", marginTop: "40px" }}
     >
       <Box padding={4} style={{ height: "100%" }}>
-        <div style={pickerStyles.content}>
-          <RasterLibraries config={config} />
-          <div style={pickerStyles.previewContainer}>
-            <RasterPreview
-              config={config}
-              initialValue={null}
-              showBorder={false}
-            />
-            <hr style={pickerStyles.divider} />
-            <RasterImages config={config} isSingleImage />
-          </div>
-        </div>
-
-        <Box style={pickerStyles.footer}>
-          <Button mode="ghost" onClick={props.onClose} text="Cancel" />
-          {count > 0 && (
-            <Button
-              tone="positive"
-              onClick={handleConfirm}
-              text={`Confirm (${count})`}
-            />
-          )}
-        </Box>
+        <Suspense fallback={<div>Loading Raster components...</div>}>
+          <RasterPickerContent {...props} />
+        </Suspense>
       </Box>
     </Dialog>
   );

@@ -16,7 +16,7 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, "src/index.tsx"),
       name: "RasterSanityPlugin",
-      fileName: (format) => `index.${format}.js`,
+      fileName: (format) => (format === "cjs" ? "index.cjs" : "index.js"),
       formats: ["es", "cjs"],
     },
     rollupOptions: {
