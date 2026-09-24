@@ -1,30 +1,31 @@
-import { Box, Card, Text } from "@sanity/ui";
 import React, { Suspense } from "react";
+import { Box } from "@sanity/ui";
+import { RasterBrowserFallback } from "./RasterFallback";
+import { RasterStudioProvider } from "./RasterStudioProvider";
 import { type RasterToolProps } from "./types";
 
-// Lazy wrapper component to avoid Node.js issues during schema extraction
-const RasterToolContent = React.lazy(() =>
-  import("./RasterToolContent").catch(() => ({
-    default: () => <div>Loading...</div>,
-  }))
+// See `RasterAssetSource` for why this is lazy.
+const RasterBrowser = React.lazy(() =>
+  import("./RasterBrowser")
+    .then((module) => ({ default: module.RasterBrowser }))
+    .catch(() => ({ default: () => <RasterBrowserFallback label="Raster failed to load." /> }))
 );
 
-export function RasterTool(props: RasterToolProps) {
-  const { config } = props;
-
-  if (!config.apiKey || !config.orgId) {
-    return (
-      <Card padding={4} tone="critical">
-        <Text>Please configure the Raster plugin with apiKey and orgId</Text>
-      </Card>
-    );
-  }
-
+/**
+ * Raster as a Studio tool: the same browser, with the whole pane to work in.
+ *
+ * The tool is also where the redirect sign-in is offered. It owns its own route, so coming
+ * back from Raster lands on this URL with nothing else on screen to lose — which is exactly
+ * what the asset-source dialog cannot say.
+ */
+export function RasterTool({ config }: RasterToolProps) {
   return (
-    <Box padding={4} style={{ height: "100%" }}>
-      <Suspense fallback={<div>Loading Raster components...</div>}>
-        <RasterToolContent {...props} />
-      </Suspense>
+    <Box padding={4} style={{ height: "100%", minHeight: 0 }}>
+      <RasterStudioProvider config={config}>
+        <Suspense fallback={<RasterBrowserFallback />}>
+          <RasterBrowser config={config} allowRedirectSignIn={config.allowRedirectSignIn !== false} />
+        </Suspense>
+      </RasterStudioProvider>
     </Box>
   );
 }

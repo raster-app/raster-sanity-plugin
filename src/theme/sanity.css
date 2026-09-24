@@ -1,0 +1,73 @@
+/**
+ * Sanity theme for @raster/ui.
+ *
+ * Reassigns the `--raster-*` tokens and nothing else — no component rules live here, which
+ * is what keeps a theme from drifting into a fork of the shared components.
+ *
+ * Sanity UI publishes its palette as `--card-*` custom properties on every `Card`, and flips
+ * them itself when the Studio's colour scheme changes. Mapping onto them means the plugin
+ * follows the Studio with no theme detection, no listener and no flash — the same trick
+ * `@raster/ui/themes/figma.css` plays with `--figma-color-*`.
+ *
+ * Two consequences worth knowing:
+ *
+ * - **The mapping lives on `.rstr-root`, not `:root`.** `--card-*` is declared on Card
+ *   elements, so a `var(--card-bg-color)` written at `:root` would resolve against the html
+ *   element, find nothing, and leave the token invalid. The root must therefore be rendered
+ *   inside a Sanity `Card` — `RasterStudioProvider` does that.
+ * - **The selector carries `[data-raster-host='sanity']`** to outweigh the two-class dark
+ *   blocks in `tokens.css`. Without it, a dark OS preference would win the cascade and paste
+ *   the SDK's own dark palette over the Studio's.
+ */
+
+.rstr-root[data-raster-host="sanity"] {
+  /* Surfaces. The literal fallbacks are the SDK's neutral defaults, for the case where the
+     root somehow renders outside a Card and `--card-*` is not there to read. */
+  --raster-bg: var(--card-bg-color, #ffffff);
+  --raster-bg-secondary: var(--card-muted-bg-color, var(--card-bg2-color, #f5f6f8));
+  --raster-bg-hover: rgba(0, 0, 0, 0.06);
+  --raster-bg-active: rgba(0, 0, 0, 0.1);
+  --raster-bg-danger: rgba(185, 28, 28, 0.1);
+
+  --raster-text: var(--card-fg-color, #14161a);
+  --raster-text-secondary: var(--card-muted-fg-color, #5b6472);
+  --raster-text-tertiary: var(--card-muted-fg-color, #8b94a3);
+  --raster-text-disabled: var(--card-muted-fg-color, #b6bcc7);
+  --raster-text-danger: var(--card-badge-critical-fg-color, #b91c1c);
+  --raster-text-onbrand: #ffffff;
+
+  --raster-border: var(--card-border-color, var(--card-hairline-soft-color, #e2e5ea));
+  --raster-border-strong: var(--card-hairline-hard-color, #c9cfd8);
+
+  /* Studio's own type, inherited from the Card rather than restated, so a studio that has
+     themed its fonts gets them here too. */
+  --raster-font: inherit;
+  --raster-font-size: 13px;
+  --raster-font-size-lg: 14px;
+
+  /* Sanity UI's radius scale: 2 is 3px, 3 is 6px. */
+  --raster-radius: 3px;
+  --raster-radius-lg: 6px;
+
+  /* Studio gives the plugin a whole pane or a wide dialog, so the grid can breathe. */
+  --raster-grid-min-column: 160px;
+  --raster-grid-gap: 12px;
+
+  --raster-focus-ring: var(
+    --card-focus-ring-box-shadow,
+    0 0 0 2px var(--card-focus-ring-color, var(--raster-brand))
+  );
+  --raster-shadow-menu: 0 6px 20px rgba(0, 0, 0, 0.18);
+}
+
+/**
+ * The overlays and the menu shadow are the only values Sanity does not publish a variable
+ * for, so they are the only ones that need to know the scheme. `RasterStudioProvider` reads
+ * it from `useRootTheme()` and sets it here.
+ */
+.rstr-root[data-raster-host="sanity"][data-raster-scheme="dark"] {
+  --raster-bg-hover: rgba(255, 255, 255, 0.08);
+  --raster-bg-active: rgba(255, 255, 255, 0.12);
+  --raster-bg-danger: rgba(248, 113, 113, 0.14);
+  --raster-shadow-menu: 0 6px 20px rgba(0, 0, 0, 0.5);
+}

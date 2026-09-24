@@ -26,7 +26,11 @@ export default defineConfig({
         "react/jsx-runtime",
         "sanity",
         "styled-components",
-        "@raster-app/raster-toolkit",
+        "@sanity/ui",
+        "@sanity/icons",
+        "@raster/sdk",
+        "@raster/react",
+        "@raster/ui",
       ],
       output: [
         {
