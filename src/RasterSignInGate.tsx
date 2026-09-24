@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useRasterClient, useSession } from "@raster/react";
 import { toUserMessage, type PkcePending } from "@raster/sdk";
 import { LoadingScreen, SignInPanel } from "@raster/ui";
-import { Card, Stack, Text } from "@sanity/ui";
+import { Card, Text } from "@sanity/ui";
 import { storagePrefix } from "./client";
 import { usePkceRedirect } from "./usePkceRedirect";
 import { type RasterConfig } from "./types";
@@ -67,7 +67,7 @@ export function RasterSignInGate({
   }
 
   return (
-    <Stack space={4} padding={4}>
+    <div className="rstr-sanity-stack rstr-sanity-gap-4 rstr-sanity-pad-4">
       {configuredKey.status === "failed" && (
         <Card tone="critical" padding={3} radius={2} border>
           <Text size={1}>
@@ -97,6 +97,6 @@ export function RasterSignInGate({
               }
         }
       />
-    </Stack>
+    </div>
   );
 }

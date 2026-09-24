@@ -31,6 +31,30 @@ npm install @raster-app/sanity-plugin-raster
 pnpm add @raster-app/sanity-plugin-raster
 ```
 
+## Compatibility
+
+| | Supported |
+| --- | --- |
+| `sanity` | 4.x, 5.x, 6.x |
+| `@sanity/ui` | 3.x, 4.x |
+| `react` | 19 |
+
+`@sanity/ui` is a **peer dependency**, not a dependency — it carries the Studio's theme through
+React context, and a second copy means a component that cannot read it. Every studio already has
+it by way of `sanity`, so there is nothing to install.
+
+The plugin uses eight symbols from it (`Button`, `TextInput`, `Card`, `Box`, `Flex`, `Text`,
+`Dialog`, `useRootTheme`), each verified to be a real runtime export at both ends of that range.
+Two things are avoided on purpose:
+
+- **`Stack` and `Inline`**, whose spacing prop was renamed `space` → `gap` between 3.0 and 4.0
+  with no spelling valid in both. They are flex containers with a gap; `src/theme/layout.css`
+  has them.
+- **`@sanity/icons`**, which moved its named icon exports to per-icon subpaths in v5 and left
+  `export declare const ImageIcon: never` behind, so the v3/v4 import still typechecks and fails
+  at runtime. The seven icons this plugin needs are inlined in `src/icons.tsx`, using @sanity/icons'
+  path data under its MIT licence so they still match Studio's own.
+
 ## Setup
 
 ```typescript

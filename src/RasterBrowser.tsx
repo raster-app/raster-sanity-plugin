@@ -19,8 +19,8 @@ import {
   SearchBar,
   type Crumb,
 } from "@raster/ui";
-import { LeaveIcon, RefreshIcon, UploadIcon } from "@sanity/icons";
-import { Button, Card, Stack, Text } from "@sanity/ui";
+import { LeaveIcon, RefreshIcon, UploadIcon } from "./icons";
+import { Button, Card, Text } from "@sanity/ui";
 import { AssetDetail } from "./AssetDetail";
 import { pinnedOrganizationId } from "./client";
 import { RasterSignInGate } from "./RasterSignInGate";
@@ -333,7 +333,7 @@ function Browser({
 
   if (pinnedMissing) {
     return (
-      <Stack space={4} padding={4}>
+      <div className="rstr-sanity-stack rstr-sanity-gap-4 rstr-sanity-pad-4">
         <Card tone="critical" padding={3} radius={2} border>
           <Text size={1}>
             This Raster credential cannot reach the organization <code>{pinned}</code> that this
@@ -341,7 +341,7 @@ function Browser({
           </Text>
         </Card>
         <Button mode="ghost" fontSize={1} icon={LeaveIcon} text="Sign out" onClick={() => void signOut()} />
-      </Stack>
+      </div>
     );
   }
 
@@ -483,7 +483,7 @@ function Browser({
           />
         ) : nav.asset !== null ? (
           <div className="rstr-sanity-detail">
-            <Stack space={3}>
+            <div className="rstr-sanity-stack rstr-sanity-gap-3">
               <Text size={1} muted>
                 {variantItems.length === 1
                   ? "This asset has no variants yet."
@@ -497,7 +497,7 @@ function Browser({
                 defaultAssetId={nav.asset.id}
                 emptyMessage="Nothing to show."
               />
-            </Stack>
+            </div>
             {selected !== null && (
               <AssetDetail
                 item={selected}

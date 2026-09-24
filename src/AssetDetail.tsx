@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { getFullSizeUrl, getThumbUrl, isReady } from "@raster/sdk";
-import { ClipboardIcon, LaunchIcon, PublishIcon, UploadIcon } from "@sanity/icons";
-import { Button, Card, Inline, Stack, Text } from "@sanity/ui";
+import { ClipboardIcon, LaunchIcon, PublishIcon, UploadIcon } from "./icons";
+import { Button, Card, Text } from "@sanity/ui";
 import { formatBytes, formatDate } from "./format";
 import { type RasterItem } from "./types";
 
@@ -72,12 +72,12 @@ export function AssetDetail({
 
   return (
     <Card padding={3} radius={2} border tone="transparent">
-      <Stack space={3}>
+      <div className="rstr-sanity-stack rstr-sanity-gap-3">
         {thumb !== undefined && (
           <img className="rstr-sanity-detail__preview" src={thumb} alt="" />
         )}
 
-        <Stack space={2}>
+        <div className="rstr-sanity-stack rstr-sanity-gap-2">
           <Text size={1} weight="medium" textOverflow="ellipsis">
             {item.name ?? item.id}
           </Text>
@@ -86,7 +86,7 @@ export function AssetDetail({
               {description}
             </Text>
           )}
-        </Stack>
+        </div>
 
         {facts.length > 0 && (
           <dl className="rstr-sanity-facts">
@@ -105,7 +105,7 @@ export function AssetDetail({
           </Text>
         )}
 
-        <Stack space={2}>
+        <div className="rstr-sanity-stack rstr-sanity-gap-2">
           {onPick !== undefined && (
             <Button
               mode="default"
@@ -146,7 +146,7 @@ export function AssetDetail({
             />
           )}
 
-          <Inline space={2}>
+          <div className="rstr-sanity-row rstr-sanity-gap-2">
             {fullSize !== null && (
               <Button
                 mode="bleed"
@@ -170,9 +170,9 @@ export function AssetDetail({
                 text="Open in Raster"
               />
             )}
-          </Inline>
-        </Stack>
-      </Stack>
+          </div>
+        </div>
+      </div>
     </Card>
   );
 }

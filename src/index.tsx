@@ -1,4 +1,4 @@
-import { ImageIcon } from "@sanity/icons";
+import { ImageIcon } from "./icons";
 import { definePlugin, type AssetSource, type Tool } from "sanity";
 import { RasterAssetSource } from "./RasterAssetSource";
 import { RasterTool } from "./RasterTool";

@@ -114,3 +114,42 @@
   white-space: nowrap;
   border: 0;
 }
+
+/**
+ * Vertical and horizontal stacks.
+ *
+ * Deliberately not Sanity UI's `Stack` and `Inline`: their spacing prop was renamed
+ * (`space` → `gap`) between @sanity/ui 3.0 and 4.0, with no spelling that works in both. A
+ * plugin that has to run in whatever Studio the user is on cannot pick one, and these are
+ * flex containers with a gap — not worth a peer-version constraint.
+ *
+ * The scale mirrors Sanity's own spacing steps, so these sit beside `Card padding` cleanly.
+ */
+.rstr-sanity-stack {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rstr-sanity-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+}
+
+.rstr-sanity-gap-2 {
+  gap: 8px;
+}
+
+.rstr-sanity-gap-3 {
+  gap: 12px;
+}
+
+.rstr-sanity-gap-4 {
+  gap: 20px;
+}
+
+.rstr-sanity-pad-4 {
+  padding: 20px;
+}
