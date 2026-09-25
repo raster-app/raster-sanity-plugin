@@ -100,7 +100,9 @@ rasterPlugin({
 
 Instead of having each editor sign in, an administrator can save an organization API key in
 the Raster tool: sign out if needed, and use **Connect everyone with an API key** on the
-sign-in screen. Editors are then connected without signing in.
+sign-in screen. Editors are then connected without signing in. The key is read on every load
+and kept in memory rather than in editors' browsers, so a rotated key takes effect on the next
+load.
 
 The key is stored in the dataset, in a document with the id `secrets.raster`. Sanity only
 returns documents with a dot in their id to signed-in users, so it is not public and does not

@@ -8,14 +8,7 @@ import { StudioKeySetup } from "./studio-key-setup";
 import { type RasterConfig } from "./types";
 import { useStudioKey } from "./use-studio-key";
 
-/**
- * Nothing below this renders until there is a credential to call Raster with.
- *
- * The ways in, in the order they are offered: an API key an admin saved for the studio
- * (adopted without asking anyone), the device code, and an API key of the editor's own. The
- * tool is also where an admin saves the studio's key. All of them end at the SDK's `connect`, which verifies against `/me` before storing anything, so a bad key is an
- * error on this screen rather than a broken session discovered three clicks later.
- */
+/** Renders its children once there is a credential; a key saved for the studio is used first. */
 export function RasterSignInGate({
   config,
   allowStudioKeySetup = false,
@@ -35,18 +28,17 @@ export function RasterSignInGate({
     message?: string;
   }>({ status: "idle" });
 
-  // Once per page load, not once per render, and never again after a sign-out: an editor who
-  // signs out of a studio with a saved key should reach the sign-in screen rather than
-  // be put straight back where they were.
-  const attempted = useRef(false);
+  // Each key is tried once per load, so signing out reaches the sign-in screen instead of
+  // reconnecting, while a key an admin just replaced is still tried.
+  const attemptedKey = useRef<string | null>(null);
 
   useEffect(() => {
-    // `undefined` is "still reading the store", which is not the same as signed out.
+    // `undefined` means the store is still being read, not signed out.
     if (credentials === undefined || isConfigured) return;
     const apiKey = studioKey.key;
-    if (apiKey == null || attempted.current) return;
+    if (apiKey == null || attemptedKey.current === apiKey) return;
 
-    attempted.current = true;
+    attemptedKey.current = apiKey;
     setConfiguredKey({ status: "connecting" });
     client.auth.connect({ apiKey }).then(
       () => setConfiguredKey({ status: "idle" }),
@@ -59,11 +51,7 @@ export function RasterSignInGate({
 
   if (isConfigured) return <>{children}</>;
 
-  if (
-    credentials === undefined ||
-    studioKey.key === undefined ||
-    configuredKey.status === "connecting"
-  ) {
+  if (credentials === undefined || configuredKey.status === "connecting") {
     return <LoadingState label="Connecting to Raster…" />;
   }
 
@@ -79,7 +67,7 @@ export function RasterSignInGate({
 
       <SignInPanel allowApiKey={config.hideApiKeySignIn !== true} />
 
-      {allowStudioKeySetup && <StudioKeySetup studioKey={studioKey} />}
+      {allowStudioKeySetup && <StudioKeySetup config={config} />}
     </Flex>
   );
 }

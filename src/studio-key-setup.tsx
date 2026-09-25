@@ -1,19 +1,15 @@
 import { useState } from "react";
-import { useRasterClient, useSession } from "@raster/react";
 import { toUserMessage } from "@raster/sdk";
 import { Button, Card, Flex, Text, TextInput } from "@sanity/ui";
 import { useCurrentUser } from "sanity";
-import { type StudioKey } from "./use-studio-key";
+import { verifyApiKey } from "./client";
+import { type RasterConfig } from "./types";
+import { useStudioKey } from "./use-studio-key";
 
-/**
- * Where an admin saves an organization API key for everyone using the studio, so editors
- * are connected without signing in. Shown in the Raster tool's sign-in screen, to
- * administrators only; Sanity's permissions still decide whether the save goes through.
- */
-export function StudioKeySetup({ studioKey }: { studioKey: StudioKey }) {
+/** Lets an administrator save or remove the API key used for everyone in this studio. */
+export function StudioKeySetup({ config }: { config: RasterConfig }) {
   /** Context */
-  const client = useRasterClient();
-  const { signOut } = useSession();
+  const studioKey = useStudioKey();
   const user = useCurrentUser();
 
   /** State */
@@ -30,21 +26,11 @@ export function StudioKeySetup({ studioKey }: { studioKey: StudioKey }) {
     setStatus("saving");
     setError(null);
     try {
-      // Connecting first checks the key against Raster, so a bad one is never saved.
-      await client.auth.connect({ apiKey });
+      await verifyApiKey(config, apiKey);
+      await studioKey.save(apiKey);
     } catch (caught) {
       console.error(caught);
       setError(toUserMessage(caught));
-      setStatus("idle");
-      return;
-    }
-    try {
-      await studioKey.save(apiKey);
-    } catch (caught) {
-      // Connected but not saved: leave this browser as it was rather than half set up.
-      console.error(caught);
-      await signOut();
-      setError(`The key works, but Sanity would not save it: ${toUserMessage(caught)}`);
       setStatus("idle");
     }
   }

@@ -6,8 +6,8 @@ import { RasterBrowserFallback } from "./RasterFallback";
 import { RasterStudioProvider } from "./RasterStudioProvider";
 import { type RasterAssetSourceProps, type RasterItem } from "./types";
 
-// Lazily loaded, as before: Studio extracts schemas in Node, and the browser's module graph
-// reaches the DOM. The `catch` keeps a failed chunk from taking the whole form down with it.
+// Lazy because Studio extracts schemas in Node, and the browser reaches the DOM. The `catch`
+// keeps a failed chunk from breaking the form.
 const RasterBrowser = React.lazy(() =>
   import("./RasterBrowser")
     .then((module) => ({ default: module.RasterBrowser }))
@@ -17,20 +17,13 @@ const RasterBrowser = React.lazy(() =>
     })
 );
 
-/**
- * The Raster picker, as an image field's asset source.
- *
- * What lands in the document is a URL for Sanity to fetch and store, plus provenance: the
- * Raster asset's id and its link in the app, under the asset document's `source`. That is
- * what lets an editor get from an image in a document back to the asset it came from.
- */
+/** The Raster picker, as an image field's asset source. */
 export function RasterAssetSource(props: RasterAssetSourceProps) {
   const { config, onSelect, onClose, dialogHeaderTitle } = props;
 
   const handlePick = useCallback(
     (item: RasterItem) => {
-      // The asset's full-size image. A search hit has no `url` of its own, only renditions,
-      // which is why this goes through the SDK rather than reading `item.url`.
+      // A search hit has no `url` of its own, only renditions.
       const url = getFullSizeUrl(item);
       if (url === null) return;
 
@@ -49,8 +42,7 @@ export function RasterAssetSource(props: RasterAssetSourceProps) {
           ...("description" in item && item.description != null && item.description !== ""
             ? { description: item.description }
             : {}),
-          // `ImageAsset` describes a stored Sanity document; Studio only reads the handful of
-          // fields above off this object and fills the rest itself once it has the file.
+          // Studio fills in the rest of the `ImageAsset` once it has the file.
         } as AssetFromSource["assetDocumentProps"],
       };
 

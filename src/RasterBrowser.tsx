@@ -53,14 +53,7 @@ export function RasterBrowser({
   );
 }
 
-/**
- * The organization → library → asset browser, shared by the tool and the picker.
- *
- * Every piece of behaviour here comes from `@raster/react`: paging, the abort-on-supersede
- * fetches, the debounced search, the remembered organization and library. What is left is the
- * Studio-shaped chrome around it, plus the two things the SDK deliberately does not decide —
- * what happens when an asset is chosen, and where the credential lives.
- */
+/** The organization → library → asset browser, shared by the tool and the picker. */
 function Browser({
   config,
   onPick,

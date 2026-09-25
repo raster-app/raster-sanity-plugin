@@ -4,7 +4,7 @@ import { RasterBrowserFallback } from "./RasterFallback";
 import { RasterStudioProvider } from "./RasterStudioProvider";
 import { type RasterToolProps } from "./types";
 
-// See `RasterAssetSource` for why this is lazy.
+// Lazy for the same reason as in `RasterAssetSource`.
 const RasterBrowser = React.lazy(() =>
   import("./RasterBrowser")
     .then((module) => ({ default: module.RasterBrowser }))

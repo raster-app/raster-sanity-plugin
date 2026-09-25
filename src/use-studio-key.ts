@@ -1,10 +1,7 @@
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useClient } from "sanity";
 
-/**
- * The document an admin saves the studio's Raster key in. An id with a dot is a path, and
- * Sanity only returns those to signed-in users — never to the public API.
- */
+// Sanity only returns documents whose id contains a dot to signed-in users.
 const SECRETS_ID = "secrets.raster";
 
 type SecretsDocument = { apiKey?: string };
@@ -16,12 +13,19 @@ export type StudioKey = {
   remove: () => Promise<void>;
 };
 
-/**
- * The organization API key an admin saved for everyone using this studio's dataset, read and
- * written with the Studio's own client. It lives in the dataset rather than the Studio config
- * so it never ships in the bundle.
- */
+const StudioKeyContext = createContext<StudioKey | null>(null);
+
+export const StudioKeyProvider = StudioKeyContext.Provider;
+
+/** The key read by `RasterStudioProvider`. */
 export function useStudioKey(): StudioKey {
+  const studioKey = useContext(StudioKeyContext);
+  if (studioKey === null) throw new Error("useStudioKey must be used inside RasterStudioProvider");
+  return studioKey;
+}
+
+/** Reads and writes the API key an admin saved in `secrets.raster`. */
+export function useStudioKeyDocument(): StudioKey {
   /** Context */
   const client = useClient({ apiVersion: "2025-01-01" });
 
@@ -47,7 +51,7 @@ export function useStudioKey(): StudioKey {
         if (!cancelled) setKey(document?.apiKey || null);
       },
       (caught: unknown) => {
-        // Unreadable is treated as unsaved: editors can still sign in themselves.
+        // Unreadable counts as unsaved, so editors can still sign in themselves.
         console.error(caught);
         if (!cancelled) setKey(null);
       }

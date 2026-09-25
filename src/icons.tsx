@@ -1,23 +1,8 @@
 import { type SVGProps } from "react";
 
 /**
- * The eight icons this plugin uses, inlined.
- *
- * Not imported from `@sanity/icons`, and that is deliberate. Its export surface changed
- * incompatibly across the majors a Studio might have:
- *
- * - **v3 / v4** export named icons from the root (`import {ImageIcon} from '@sanity/icons'`)
- *   and have no per-icon subpaths.
- * - **v5** removed every named export from the root in favour of subpaths
- *   (`@sanity/icons/Image`), leaving `export declare const ImageIcon: never` behind as a
- *   type-level tombstone — which means the old import still *typechecks* (everything accepts
- *   `never`) and fails at runtime with "does not provide an export named 'ImageIcon'".
- *
- * There is no spelling that works on both, and a plugin does not get to choose which Studio
- * it is installed into. Seven inline SVGs cost less than that compatibility problem.
- *
- * The path data is from @sanity/icons so these sit correctly beside Studio's own icons at any
- * version, and is used under its licence:
+ * Icons inlined from @sanity/icons, whose v5 imports fail at runtime on v3/v4 (see README).
+ * Path data used under its licence:
  *
  * > MIT License. Copyright (c) 2026 Sanity.io
  * >
