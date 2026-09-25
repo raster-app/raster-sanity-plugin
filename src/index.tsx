@@ -7,6 +7,7 @@ import type { RasterConfig } from './types'
 export * from './types'
 
 /** Adds Raster as an asset source on every image field, and a Raster tool. */
+// biome-ignore lint/suspicious/noConfusingVoidType: `void` is what makes the argument optional, so `rasterPlugin()` works.
 export const rasterPlugin = definePlugin<RasterConfig | void>((config) => {
 	const settings: RasterConfig = config ?? {}
 
