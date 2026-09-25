@@ -1,4 +1,4 @@
-import { useMemo, type ComponentProps, type ReactNode } from "react";
+import { type ComponentProps, type ReactNode } from "react";
 import { RasterProvider } from "@raster/react";
 import {
   RasterComponentsProvider,
@@ -7,6 +7,7 @@ import {
   type SlotInputProps,
 } from "@raster/ui";
 import { Button, Card, TextInput, useRootTheme } from "@sanity/ui";
+import { useWorkspace } from "sanity";
 import { getRasterClient } from "./client";
 import { useRasterStyles } from "./theme/useRasterStyles";
 import { type RasterConfig } from "./types";
@@ -87,9 +88,8 @@ export function RasterStudioProvider({
   useRasterStyles();
   const scheme = useStudioScheme();
 
-  // Never created during render: the SDK keeps one session store per client, and a second
-  // store for one credential can rotate the other's refresh token into a revoked connection.
-  const client = useMemo(() => getRasterClient(config), [config]);
+  const workspace = useWorkspace().name;
+  const client = getRasterClient(config, workspace);
 
   return (
     <RasterProvider client={client}>

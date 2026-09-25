@@ -3,6 +3,7 @@ import { useRasterClient, useSession } from "@raster/react";
 import { toUserMessage, type PkcePending } from "@raster/sdk";
 import { LoadingScreen, SignInPanel } from "@raster/ui";
 import { Card, Text } from "@sanity/ui";
+import { useWorkspace } from "sanity";
 import { storagePrefix } from "./client";
 import { StudioKeySetup } from "./studio-key-setup";
 import { usePkceRedirect } from "./usePkceRedirect";
@@ -33,9 +34,10 @@ export function RasterSignInGate({
   const client = useRasterClient();
   const { credentials, isConfigured } = useSession();
   const studioKey = useStudioKey();
+  const workspace = useWorkspace().name;
   const pkce = usePkceRedirect({
     enabled: allowRedirectSignIn,
-    storagePrefix: storagePrefix(config),
+    storagePrefix: storagePrefix(workspace),
   });
 
   const [configuredKey, setConfiguredKey] = useState<{

@@ -15,6 +15,9 @@ sign in to Raster from inside Studio, and the plugin adds a Raster tool alongsid
 - **`apiKey` is no longer a config option.** It shipped the key in the Studio bundle. Editors
   now sign in with their own Raster account, or an administrator saves the key once in the
   Raster tool. See [An API key for everyone](README.md#an-api-key-for-everyone).
+- **`storageKeyPrefix`, `apiOrigin` and `authOrigin` are removed.** Each Studio workspace now
+  keeps its own Raster session, so workspaces with different keys or organizations no longer
+  share one.
 
 ### Migrating from 1.x
 

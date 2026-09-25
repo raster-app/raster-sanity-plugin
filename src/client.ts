@@ -6,26 +6,18 @@ import {
 } from "@raster/sdk";
 import { type RasterConfig } from "./types";
 
-const DEFAULT_PREFIX = "raster";
-
 /**
- * One client per storage namespace, built lazily and kept for the life of the page.
- *
- * The SDK is deliberate about this: a second client means a second session store, and two
- * stores holding one credential can rotate each other's refresh token into oblivion — which
- * Raster treats as theft and answers by revoking the connection. So the client must not be
- * created during render, and two components reading the same namespace must get the same
- * instance.
- *
- * Keyed on the namespace rather than kept in a module-level constant, because a page can
- * mount several studios: each names its own `storageKeyPrefix` and they never see each
- * other's credential.
+ * One client per Studio workspace, built lazily and kept for the life of the page, so every
+ * component in a workspace shares one session. Workspaces can pin different organizations,
+ * so each gets its own client and credential rather than the first one to load winning — see
+ * the SDK's "The client is an instance, not a singleton":
+ * https://github.com/raster-app/raster-sdk#the-client-is-an-instance-not-a-singleton
  */
 const clients = new Map<string, RasterClient>();
 
-/** The `localStorage` namespace this config's session lives in. */
-export function storagePrefix(config: RasterConfig): string {
-  return config.storageKeyPrefix ?? DEFAULT_PREFIX;
+/** The `localStorage` namespace a workspace's session lives in. */
+export function storagePrefix(workspace: string): string {
+  return `raster.${workspace}`;
 }
 
 /** The organization the config pins the plugin to, if any. */
@@ -33,15 +25,11 @@ export function pinnedOrganizationId(config: RasterConfig): string | null {
   return config.organizationId ?? config.orgId ?? null;
 }
 
-export function getRasterClient(config: RasterConfig): RasterClient {
-  const prefix = storagePrefix(config);
-  // The origins are part of the identity: a client pointed at a different API would be a
-  // different session, and sharing one store between them would mix the two.
-  const key = [prefix, config.apiOrigin ?? "", config.authOrigin ?? ""].join("|");
-
-  const existing = clients.get(key);
+export function getRasterClient(config: RasterConfig, workspace: string): RasterClient {
+  const existing = clients.get(workspace);
   if (existing !== undefined) return existing;
 
+  const prefix = storagePrefix(workspace);
   const client = createRasterClient({
     host: {
       name: config.hostName ?? "Sanity",
@@ -50,16 +38,12 @@ export function getRasterClient(config: RasterConfig): RasterClient {
         window.open(url, "_blank", "noopener,noreferrer");
       },
     },
-    // Studio is an admin UI on an origin the team controls, and the alternative is asking
-    // every editor to sign in again on every reload. It does mean the bearer token is
-    // readable by any script on that origin; `storageKeyPrefix` is how a studio keeps
-    // several sessions apart, not a security boundary.
+    // Kept in `localStorage` so editors do not sign in again on every reload. Any script or
+    // plugin on the Studio's origin can read it.
     credentials: localStorageCredentialStore(`${prefix}.credentials`),
     state: localStorageStateStore(`${prefix}.state.`),
-    apiOrigin: config.apiOrigin,
-    authOrigin: config.authOrigin,
   });
 
-  clients.set(key, client);
+  clients.set(workspace, client);
   return client;
 }

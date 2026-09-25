@@ -32,19 +32,6 @@ export interface RasterConfig {
 
   /** Hide the "use an API key instead" path from the sign-in screen. Defaults to false. */
   hideApiKeySignIn?: boolean;
-
-  /**
-   * Namespace for the credential and the remembered organization/library in
-   * `localStorage`. Set it when one page mounts several studios, or several Raster plugin
-   * instances, that should not share a session. Defaults to `"raster"`.
-   */
-  storageKeyPrefix?: string;
-
-  /** Override the Raster API origin. For a proxy, or for tests. */
-  apiOrigin?: string;
-
-  /** Override the Raster authorization server origin. For tests. */
-  authOrigin?: string;
 }
 
 /**

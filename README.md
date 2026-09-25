@@ -92,10 +92,6 @@ rasterPlugin({
 
   // Hide the "use an API key instead" path from the sign-in screen. Default false.
   hideApiKeySignIn: false,
-
-  // Namespace for the stored session. Set it when one page mounts several studios that
-  // should not share a Raster session. Defaults to "raster".
-  storageKeyPrefix: "raster",
 });
 ```
 
@@ -119,7 +115,7 @@ So create the key for this Studio alone, with access to only the libraries it ne
 
 ### Where the session is stored
 
-The credential is kept in `localStorage`, per browser and per `storageKeyPrefix`, so editors
+The credential is kept in `localStorage`, per browser and per Studio workspace, so editors
 sign in once rather than on every reload. It also means **any script or plugin running on the
 Studio's origin can read the token** — the usual trade for an admin UI, but worth making
 deliberately. Signing out clears it and asks Raster to revoke the session, and an editor can
