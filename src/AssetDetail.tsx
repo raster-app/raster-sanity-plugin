@@ -1,6 +1,6 @@
 import { Fragment, useState } from "react";
 import { getFullSizeUrl, getThumbUrl, isReady } from "@raster/sdk";
-import { ClipboardIcon, LaunchIcon, PublishIcon, UploadIcon } from "./icons";
+import { icons } from "@sanity/icons";
 import { Box, Button, Card, Flex, Grid, Text } from "@sanity/ui";
 import { formatBytes, formatDate } from "./format";
 import { type RasterItem } from "./types";
@@ -152,7 +152,7 @@ export function AssetDetail({
               mode="ghost"
               fontSize={1}
               padding={3}
-              icon={PublishIcon}
+              icon={icons.publish}
               disabled={!ready || busy !== null}
               loading={busy === "promote"}
               onClick={onPromote}
@@ -168,7 +168,7 @@ export function AssetDetail({
               mode="ghost"
               fontSize={1}
               padding={3}
-              icon={UploadIcon}
+              icon={icons.upload}
               disabled={busy !== null}
               onClick={onUploadVariant}
               text="Add a variant"
@@ -181,7 +181,7 @@ export function AssetDetail({
                 mode="bleed"
                 fontSize={1}
                 padding={2}
-                icon={ClipboardIcon}
+                icon={icons.clipboard}
                 onClick={copy}
                 text={copied ? "Copied" : "Copy URL"}
               />
@@ -195,7 +195,7 @@ export function AssetDetail({
                 mode="bleed"
                 fontSize={1}
                 padding={2}
-                icon={LaunchIcon}
+                icon={icons.launch}
                 text="Open in Raster"
               />
             )}

@@ -1,5 +1,5 @@
-import { ImageIcon } from "./icons";
 import { definePlugin, type AssetSource, type Tool } from "sanity";
+import { icons } from "@sanity/icons";
 import { RasterAssetSource } from "./RasterAssetSource";
 import { RasterTool } from "./RasterTool";
 import { type RasterConfig } from "./types";
@@ -22,13 +22,13 @@ export const rasterPlugin = definePlugin<RasterConfig | void>((config) => {
     name: "raster",
     title: "Raster",
     component: (props) => <RasterAssetSource {...props} config={settings} />,
-    icon: ImageIcon,
+    icon: icons.image,
   };
 
   const rasterTool: Tool = {
     name: "raster",
     title: "Raster Assets",
-    icon: ImageIcon,
+    icon: icons.image,
     component: () => <RasterTool config={settings} />,
   };
 

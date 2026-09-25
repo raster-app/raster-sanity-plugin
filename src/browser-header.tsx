@@ -5,8 +5,8 @@ import {
   type Organization,
   type RasterNavigation,
 } from "@raster/react";
+import { icons } from "@sanity/icons";
 import { Box, Button, Flex, Select, Text, TextInput } from "@sanity/ui";
-import { LeaveIcon, RefreshIcon, SearchIcon, UploadIcon } from "./icons";
 
 type Crumb = { key: string; label: string; onClick?: () => void };
 
@@ -120,7 +120,7 @@ export function BrowserHeader({
             mode="ghost"
             fontSize={1}
             padding={2}
-            icon={UploadIcon}
+            icon={icons.upload}
             text={nav.asset === null ? "Upload" : "Add a variant"}
             disabled={isUploading}
             loading={isUploading}
@@ -131,7 +131,7 @@ export function BrowserHeader({
           mode="bleed"
           fontSize={1}
           padding={2}
-          icon={RefreshIcon}
+          icon={icons.refresh}
           title="Refresh"
           aria-label="Refresh"
           onClick={onRefresh}
@@ -140,7 +140,7 @@ export function BrowserHeader({
           mode="bleed"
           fontSize={1}
           padding={2}
-          icon={LeaveIcon}
+          icon={icons.leave}
           text="Sign out"
           title={
             isSignedIn
@@ -156,7 +156,7 @@ export function BrowserHeader({
           {/* No debounce here: `useAssetSearch` already debounces, and twice feels laggy. */}
           <TextInput
             type="search"
-            icon={SearchIcon}
+            icon={icons.search}
             fontSize={1}
             padding={2}
             value={nav.query}

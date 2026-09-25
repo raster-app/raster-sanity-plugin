@@ -56,10 +56,6 @@ are avoided on purpose:
 - **`MenuButton`, `Menu`, `Breadcrumbs`, `Tooltip`, `Popover` and `Code`**, which 4.x moved
   to subpaths that 3.x does not have. The organization switcher is a `Select`, and the
   breadcrumb is `Flex` with `Button` and `Text`.
-- **`@sanity/icons`**, which moved its named icon exports to per-icon subpaths in v5 and left
-  `export declare const ImageIcon: never` behind, so the v3/v4 import still typechecks and fails
-  at runtime. The eight icons this plugin needs are inlined in `src/icons.tsx`, using @sanity/icons'
-  path data under its MIT licence so they still match Studio's own.
 
 ## Setup
 

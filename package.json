@@ -44,7 +44,8 @@
   },
   "dependencies": {
     "@raster/react": "link:../raster-plugin-sdk/packages/react",
-    "@raster/sdk": "link:../raster-plugin-sdk/packages/sdk"
+    "@raster/sdk": "link:../raster-plugin-sdk/packages/sdk",
+    "@sanity/icons": "^3.7.4 || ^5.2.2"
   },
   "peerDependencies": {
     "@sanity/ui": "^3.0.0 || ^4.0.0",

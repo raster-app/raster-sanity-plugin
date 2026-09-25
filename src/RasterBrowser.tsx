@@ -9,10 +9,10 @@ import {
 } from "@raster/react";
 import { type Asset } from "@raster/sdk";
 import { Box, Button, Card, Flex, Text } from "@sanity/ui";
+import { icons } from "@sanity/icons";
 import { AssetGrid } from "./asset-grid";
 import { BrowserHeader } from "./browser-header";
 import { pinnedOrganizationId } from "./client";
-import { LeaveIcon } from "./icons";
 import { LibraryList } from "./library-list";
 import { LoadingState } from "./loading-state";
 import { RasterSignInGate } from "./RasterSignInGate";
@@ -157,7 +157,7 @@ function Browser({
             studio is configured for.
           </Text>
         </Card>
-        <Button mode="ghost" fontSize={1} icon={LeaveIcon} text="Sign out" onClick={() => void signOut()} />
+        <Button mode="ghost" fontSize={1} icon={icons.leave} text="Sign out" onClick={() => void signOut()} />
       </Flex>
     );
   }
