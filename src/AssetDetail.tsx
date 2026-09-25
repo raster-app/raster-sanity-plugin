@@ -1,8 +1,7 @@
 import { Fragment, useState } from "react";
-import { getFullSizeUrl, getThumbUrl, isReady } from "@raster/sdk";
+import { formatDate, formatFileSize, getFullSizeUrl, getThumbUrl, isReady } from "@raster/sdk";
 import { icons } from "@sanity/icons";
 import { Box, Button, Card, Flex, Grid, Text } from "@sanity/ui";
-import { formatBytes, formatDate } from "./format";
 import { type RasterItem } from "./types";
 
 export type AssetDetailProps = {
@@ -55,11 +54,11 @@ export function AssetDetail({
   if (item.width !== null && item.height !== null) {
     facts.push(["Size", `${item.width} × ${item.height}`]);
   }
-  const bytes = formatBytes(size);
-  if (bytes !== null) facts.push(["File", bytes]);
+  const bytes = formatFileSize(size);
+  if (bytes !== "") facts.push(["File", bytes]);
   if (contentType != null && contentType !== "") facts.push(["Type", contentType]);
-  const date = formatDate(created);
-  if (date !== null) facts.push(["Added", date]);
+  const date = formatDate(created ?? null);
+  if (date !== "") facts.push(["Added", date]);
   if (uploadedBy != null && uploadedBy !== "") facts.push(["By", uploadedBy]);
 
   const copy = () => {
