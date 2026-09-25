@@ -7,16 +7,6 @@ import { type AssetSourceComponentProps, type Tool } from "sanity";
  */
 export interface RasterConfig {
   /**
-   * An organization API key, adopted automatically on first render.
-   *
-   * Convenient for a studio where every editor should reach the same organization without
-   * signing in, and the only option that needs no interaction. Note that it ships in the
-   * Studio bundle, so it is readable by anyone who can open the Studio — prefer letting
-   * editors sign in when that matters.
-   */
-  apiKey?: string;
-
-  /**
    * Pin the plugin to one organization. The organization switcher is then hidden, and a
    * credential that cannot reach this organization reports that rather than quietly
    * browsing another one.

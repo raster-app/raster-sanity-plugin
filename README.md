@@ -14,7 +14,8 @@ behaviour matches across hosts while the chrome stays native to Studio.
   document, and the Raster asset's id and app link are recorded on the Sanity asset.
 - **A Raster tool** for browsing libraries on their own, with the whole pane to work in.
 - **Sign in from inside Studio** — the device code flow, a redirect sign-in, or an
-  organization API key. No credentials in your Studio config required.
+  organization API key, which an admin can also save once for everyone. No credentials in
+  your Studio config.
 - **Organization switcher** for a credential that reaches more than one.
 - **Full-text search** across an organization, or narrowed to the open library.
 - **Variants** — browse an asset's crops and adjustments, and promote one to be the default.
@@ -79,10 +80,6 @@ Every option is optional.
 
 ```typescript
 rasterPlugin({
-  // Connect with an organization API key instead of asking editors to sign in. Convenient,
-  // but it ships in the Studio bundle and is readable by anyone who can open the Studio.
-  apiKey: process.env.SANITY_STUDIO_RASTER_API_KEY,
-
   // Pin the plugin to one organization. The switcher is then hidden.
   organizationId: "acme",
 
@@ -104,12 +101,29 @@ rasterPlugin({
 
 `orgId` from earlier versions still works and means the same thing as `organizationId`.
 
+### An API key for everyone
+
+Instead of having each editor sign in, an administrator can save an organization API key in
+the Raster tool: sign out if needed, and use **Connect everyone with an API key** on the
+sign-in screen. Editors are then connected without signing in.
+
+The key is stored in the dataset, in a document with the id `secrets.raster`. Sanity only
+returns documents with a dot in their id to signed-in users, so it is not public and does not
+ship in the Studio bundle. It is not hidden from your team, though:
+
+- **Anyone signed in to the Studio who can read documents can read the key.** Custom roles,
+  available on Enterprise plans, can limit that.
+- **Dataset exports include it.**
+
+So create the key for this Studio alone, with access to only the libraries it needs.
+
 ### Where the session is stored
 
-The credential is kept in `localStorage`, per browser and per `storageKeyPrefix`. That means
-editors sign in once rather than on every reload, and it also means the bearer token is
-readable by any script on the Studio's origin — the usual trade for an admin UI, but worth
-making deliberately. Signing out clears it and asks Raster to revoke the session.
+The credential is kept in `localStorage`, per browser and per `storageKeyPrefix`, so editors
+sign in once rather than on every reload. It also means **any script or plugin running on the
+Studio's origin can read the token** — the usual trade for an admin UI, but worth making
+deliberately. Signing out clears it and asks Raster to revoke the session, and an editor can
+also revoke it in Raster under **Settings > Connected apps**.
 
 ## Usage
 
@@ -149,10 +163,8 @@ from.
 
 ### Promoting a variant
 
-Raster serves an asset's default image from a stable URL. Promoting a variant replaces the
-file behind that URL, so documents already referencing it show the new image without being
-edited — Sanity's copy of the file, however, was fetched at pick time and does not change. To
-move a published document to a promoted variant, pick the image again.
+Sanity keeps the file it copied when the image was picked. Promoting a variant in Raster
+doesn't change documents; to update one, pick the image again.
 
 ## Development
 
@@ -190,7 +202,9 @@ pnpm install
 | `src/index.tsx`           | The plugin: the asset source and the tool.                               |
 | `src/client.ts`           | One `RasterClient` per storage namespace, with Studio's host adapters.    |
 | `src/RasterStudioProvider.tsx` | The provider, Sanity's Button and Input in the shared components' slots, and the themed root. |
-| `src/RasterSignInGate.tsx` | The three ways in, and the configured API key.                           |
+| `src/RasterSignInGate.tsx` | The three ways in, and the API key saved for the studio.                 |
+| `src/use-studio-key.ts`   | Reads and writes that key in the `secrets.raster` document.              |
+| `src/studio-key-setup.tsx` | Where an administrator saves or removes it, in the tool.                |
 | `src/RasterBrowser.tsx`   | The organization → library → asset browser, shared by tool and picker.   |
 | `src/browser-header.tsx`  | The switcher, breadcrumb, actions and search box.                        |
 | `src/variant-view.tsx`    | One asset's default and variants, with the detail pane.                  |

@@ -12,11 +12,18 @@ export * from "./types";
  * libraries on their own.
  *
  * Config is optional — with none, editors sign in to Raster from inside Studio and the
- * session is remembered per browser. See `RasterConfig` for the API-key and pinned-organization
- * shortcuts a studio may prefer.
+ * session is remembered per browser. An admin can instead save an API key for everyone in the
+ * Raster tool. See `RasterConfig` for pinning an organization.
  */
 export const rasterPlugin = definePlugin<RasterConfig | void>((config) => {
   const settings: RasterConfig = config ?? {};
+
+  // 1.x took the key here, where it shipped in the Studio bundle. It is ignored now.
+  if ("apiKey" in settings) {
+    console.warn(
+      "rasterPlugin: `apiKey` is no longer supported. Remove it, and save the key in the Raster tool instead."
+    );
+  }
 
   const rasterSource: AssetSource = {
     name: "raster",

@@ -26,7 +26,11 @@ export function RasterTool({ config }: RasterToolProps) {
     <Box padding={4} style={{ height: "100%", minHeight: 0 }}>
       <RasterStudioProvider config={config}>
         <Suspense fallback={<RasterBrowserFallback />}>
-          <RasterBrowser config={config} allowRedirectSignIn={config.allowRedirectSignIn !== false} />
+          <RasterBrowser
+            config={config}
+            allowRedirectSignIn={config.allowRedirectSignIn !== false}
+            allowStudioKeySetup
+          />
         </Suspense>
       </RasterStudioProvider>
     </Box>

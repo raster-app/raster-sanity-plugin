@@ -29,6 +29,8 @@ export type RasterBrowserProps = {
   pickLabel?: string;
   /** Offer the redirect sign-in. False in the dialog, where a redirect loses the document. */
   allowRedirectSignIn?: boolean;
+  /** Let an admin save an API key for the studio. True in the tool only. */
+  allowStudioKeySetup?: boolean;
 };
 
 export function RasterBrowser({
@@ -36,10 +38,15 @@ export function RasterBrowser({
   onPick,
   pickLabel = "Use this image",
   allowRedirectSignIn = false,
+  allowStudioKeySetup = false,
 }: RasterBrowserProps) {
   return (
     <div className="rstr-sanity-browser">
-      <RasterSignInGate config={config} allowRedirectSignIn={allowRedirectSignIn}>
+      <RasterSignInGate
+        config={config}
+        allowRedirectSignIn={allowRedirectSignIn}
+        allowStudioKeySetup={allowStudioKeySetup}
+      >
         <Browser config={config} onPick={onPick} pickLabel={pickLabel} />
       </RasterSignInGate>
     </div>
