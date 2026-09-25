@@ -5,8 +5,8 @@ Browse your Raster organizations, libraries and variants from inside Studio, and
 straight into any image field.
 
 Built on the [Raster Plugin SDK](https://github.com/raster-app/raster-sdk) — the same client,
-OAuth flows, image renditions and shared components that power Raster's Figma plugin, so the
-behaviour matches across hosts while the chrome stays native to Studio.
+OAuth flows and image renditions that power Raster's Figma plugin — with every screen drawn in
+`@sanity/ui`, so it looks and behaves like the rest of Studio.
 
 ## Features
 
@@ -22,7 +22,8 @@ behaviour matches across hosts while the chrome stays native to Studio.
 - **Upload** by button or drag-and-drop, as a new asset or as a variant of an existing one.
 - **Infinite paging, blurhash placeholders and reserved aspect ratios**, so the grid does not
   reflow as images land.
-- **Follows the Studio's colour scheme** by reading Sanity UI's own palette variables.
+- **Native Studio UI**, built from `@sanity/ui`, so it follows the Studio's theme and colour
+  scheme.
 
 ## Installation
 
@@ -46,16 +47,19 @@ Upgrading from 1.x, which supported Sanity v3? See the [migration notes](CHANGEL
 React context, and a second copy means a component that cannot read it. Every studio already has
 it by way of `sanity`, so there is nothing to install.
 
-The plugin uses eight symbols from it (`Button`, `TextInput`, `Card`, `Box`, `Flex`, `Text`,
-`Dialog`, `useRootTheme`), each verified to be a real runtime export at both ends of that range.
-Two things are avoided on purpose:
+The plugin only uses components exported from the package root in both 3.x and 4.x: `Badge`,
+`Box`, `Button`, `Card`, `Dialog`, `Flex`, `Grid`, `Select`, `Spinner`, `Text` and
+`TextInput`, laid out with `Flex` and `Grid`'s `gap`, which both versions accept. Some things
+are avoided on purpose:
 
 - **`Stack` and `Inline`**, whose spacing prop was renamed `space` → `gap` between 3.0 and 4.0
-  with no spelling valid in both. They are flex containers with a gap; `src/theme/layout.css`
-  has them.
+  with no spelling valid in both. `<Flex direction="column" gap={3}>` does the same job.
+- **`MenuButton`, `Menu`, `Breadcrumbs`, `Tooltip`, `Popover` and `Code`**, which 4.x moved
+  to subpaths that 3.x does not have. The organization switcher is a `Select`, and the
+  breadcrumb is `Flex` with `Button` and `Text`.
 - **`@sanity/icons`**, which moved its named icon exports to per-icon subpaths in v5 and left
   `export declare const ImageIcon: never` behind, so the v3/v4 import still typechecks and fails
-  at runtime. The seven icons this plugin needs are inlined in `src/icons.tsx`, using @sanity/icons'
+  at runtime. The eight icons this plugin needs are inlined in `src/icons.tsx`, using @sanity/icons'
   path data under its MIT licence so they still match Studio's own.
 
 ## Setup
@@ -165,10 +169,11 @@ doesn't change documents; to update one, pick the image again.
 ## Development
 
 The plugin is built against the [Raster Plugin SDK](https://github.com/raster-app/raster-sdk)
-packages: `@raster/sdk` (the REST client, OAuth and image helpers), `@raster/react` (provider
-and hooks) and `@raster/ui` (the shared grid, switcher and sign-in, themed per host).
+packages: `@raster/sdk` (the REST client, OAuth and image helpers) and `@raster/react`
+(provider and hooks). The SDK is headless; everything on screen is this plugin's, in
+`@sanity/ui`.
 
-> **While the SDK is unpublished**, the three `@raster/*` dependencies point at a sibling
+> **While the SDK is unpublished**, the two `@raster/*` dependencies point at a sibling
 > checkout with `link:../raster-plugin-sdk/...`, so `pnpm install` expects
 > `raster-plugin-sdk` next to this repository with its packages built (`pnpm build` there).
 > Replace them with the published ranges before releasing.
@@ -196,22 +201,23 @@ pnpm install
 | File                      | What it does                                                             |
 | ------------------------- | ------------------------------------------------------------------------ |
 | `src/index.tsx`           | The plugin: the asset source and the tool.                               |
-| `src/client.ts`           | One `RasterClient` per storage namespace, with Studio's host adapters.    |
-| `src/RasterStudioProvider.tsx` | The provider, Sanity's Button and Input in the shared components' slots, and the themed root. |
+| `src/client.ts`           | One `RasterClient` per Studio workspace, with Studio's host adapters.     |
+| `src/RasterStudioProvider.tsx` | The workspace's client, for the `@raster/react` hooks.             |
 | `src/RasterSignInGate.tsx` | The three ways in, and the API key saved for the studio.                 |
+| `src/sign-in-panel.tsx`   | The sign-in screens: device code, redirect and API key.                  |
 | `src/use-studio-key.ts`   | Reads and writes that key in the `secrets.raster` document.              |
 | `src/studio-key-setup.tsx` | Where an administrator saves or removes it, in the tool.                |
 | `src/RasterBrowser.tsx`   | The organization → library → asset browser, shared by tool and picker.   |
 | `src/browser-header.tsx`  | The switcher, breadcrumb, actions and search box.                        |
+| `src/library-list.tsx`    | An organization's libraries.                                             |
+| `src/asset-grid.tsx`      | The asset grid, with infinite paging and blurhash placeholders.          |
 | `src/variant-view.tsx`    | One asset's default and variants, with the detail pane.                  |
 | `src/use-browser-actions.ts` | Upload and promote, and the busy, error and notice they report.       |
 | `src/AssetDetail.tsx`     | The selected asset's facts and actions.                                  |
-| `src/theme/sanity.css`    | The `--raster-*` token contract mapped onto Sanity UI's `--card-*`.      |
+| `src/loading-state.tsx`   | A spinner with a label.                                                  |
 
-Theming is the whole contract: every colour, radius and font in the shared components reads a
-`--raster-*` custom property, and `src/theme/sanity.css` reassigns them and nothing else. A
-rule that is not a token reassignment belongs in `src/theme/layout.css` — or in the SDK's token
-contract, if a component is missing a hook.
+There is no stylesheet: layout is `Flex`, `Grid` and `Box`, and colour comes from `Card` tones,
+so the plugin follows the Studio's theme without a token map.
 
 ## Contributing
 

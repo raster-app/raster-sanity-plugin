@@ -8,11 +8,13 @@ import {
   useSession,
 } from "@raster/react";
 import { type Asset } from "@raster/sdk";
-import { AssetGrid, LibraryList, LoadingScreen } from "@raster/ui";
-import { Button, Card, Text } from "@sanity/ui";
+import { Box, Button, Card, Flex, Text } from "@sanity/ui";
+import { AssetGrid } from "./asset-grid";
 import { BrowserHeader } from "./browser-header";
 import { pinnedOrganizationId } from "./client";
 import { LeaveIcon } from "./icons";
+import { LibraryList } from "./library-list";
+import { LoadingState } from "./loading-state";
 import { RasterSignInGate } from "./RasterSignInGate";
 import { isImage, type RasterConfig, type RasterItem } from "./types";
 import { useBrowserActions } from "./use-browser-actions";
@@ -41,7 +43,9 @@ export function RasterBrowser({
   allowStudioKeySetup = false,
 }: RasterBrowserProps) {
   return (
-    <div className="rstr-sanity-browser">
+    // The picker dialog and the tool pane both hand down a fixed height; the grid scrolls inside
+    // it rather than growing the page.
+    <Flex direction="column" gap={3} style={{ height: "100%", minHeight: 0 }}>
       <RasterSignInGate
         config={config}
         allowRedirectSignIn={allowRedirectSignIn}
@@ -49,7 +53,7 @@ export function RasterBrowser({
       >
         <Browser config={config} onPick={onPick} pickLabel={pickLabel} />
       </RasterSignInGate>
-    </div>
+    </Flex>
   );
 }
 
@@ -77,9 +81,7 @@ function Browser({
   const allOrganizations = useOrganizations();
   const pinned = pinnedOrganizationId(config);
 
-  // A configured organization pins the plugin to it: the switcher then has nothing to switch
-  // to and renders as just the Raster mark, which is the behaviour studios that set `orgId`
-  // already had.
+  // A configured organization pins the plugin to it, so there is nothing to switch to.
   const organizations = useMemo(() => {
     if (allOrganizations.data === null) return null;
     if (pinned === null) return allOrganizations.data;
@@ -159,7 +161,7 @@ function Browser({
   /** Early returns */
   if (pinnedMissing) {
     return (
-      <div className="rstr-sanity-stack rstr-sanity-gap-4 rstr-sanity-pad-4">
+      <Flex direction="column" align="flex-start" gap={4} padding={4}>
         <Card tone="critical" padding={3} radius={2} border>
           <Text size={1}>
             This Raster account can't reach the organization <code>{pinned}</code> that this
@@ -167,14 +169,14 @@ function Browser({
           </Text>
         </Card>
         <Button mode="ghost" fontSize={1} icon={LeaveIcon} text="Sign out" onClick={() => void signOut()} />
-      </div>
+      </Flex>
     );
   }
 
   // `isRestored` is false until the remembered organization and library have been read back.
   // Rendering the library list first and then jumping into a library is worse than waiting.
   if (organizations === null || !nav.isRestored) {
-    return <LoadingScreen label="Loading your Raster libraries…" />;
+    return <LoadingState label="Loading your Raster libraries…" />;
   }
 
   /** Render-only values */
@@ -211,8 +213,12 @@ function Browser({
         </Card>
       )}
 
-      <div
-        className="rstr-sanity-browser__body"
+      <Box
+        flex={1}
+        overflow="auto"
+        // `minHeight: 0` is what lets this shrink below its content and scroll. The padding
+        // leaves room for the focus ring on the last row of tiles.
+        style={{ position: "relative", minHeight: 0, padding: 2 }}
         onDragOver={(event) => {
           if (!actions.canUpload) return;
           event.preventDefault();
@@ -228,11 +234,21 @@ function Browser({
         onDrop={handleDrop}
       >
         {isDropping && (
-          <div className="rstr-sanity-browser__drop">
-            {nav.asset === null
-              ? `Drop to upload to ${nav.library?.name ?? "this library"}`
-              : `Drop to add a variant of ${nav.asset.name ?? "this asset"}`}
-          </div>
+          // Covers the scroll area, so the whole grid reads as one target.
+          <Card
+            tone="primary"
+            radius={3}
+            border
+            style={{ position: "absolute", inset: 0, zIndex: 2, pointerEvents: "none" }}
+          >
+            <Flex align="center" justify="center" height="fill">
+              <Text size={2}>
+                {nav.asset === null
+                  ? `Drop to upload to ${nav.library?.name ?? "this library"}`
+                  : `Drop to add a variant of ${nav.asset.name ?? "this asset"}`}
+              </Text>
+            </Flex>
+          </Card>
         )}
 
         {search.active ? (
@@ -286,11 +302,11 @@ function Browser({
             }
           />
         )}
-      </div>
+      </Box>
 
       <input
         ref={actions.fileInputRef}
-        className="rstr-sanity-visually-hidden"
+        style={{ display: "none" }}
         type="file"
         accept="image/*"
         tabIndex={-1}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRasterClient, useSession } from "@raster/react";
 import { toUserMessage } from "@raster/sdk";
-import { Button, Card, Text, TextInput } from "@sanity/ui";
+import { Button, Card, Flex, Text, TextInput } from "@sanity/ui";
 import { useCurrentUser } from "sanity";
 import { type StudioKey } from "./use-studio-key";
 
@@ -67,7 +67,7 @@ export function StudioKeySetup({ studioKey }: { studioKey: StudioKey }) {
 
   return (
     <Card padding={4} radius={2} border>
-      <div className="rstr-sanity-stack rstr-sanity-gap-3">
+      <Flex direction="column" gap={3}>
         <Text size={1} weight="semibold">
           Connect everyone with an API key
         </Text>
@@ -89,7 +89,7 @@ export function StudioKeySetup({ studioKey }: { studioKey: StudioKey }) {
             <Text size={1}>{error}</Text>
           </Card>
         )}
-        <div className="rstr-sanity-row rstr-sanity-gap-2">
+        <Flex gap={2} wrap="wrap">
           <Button
             mode="default"
             tone="primary"
@@ -112,8 +112,8 @@ export function StudioKeySetup({ studioKey }: { studioKey: StudioKey }) {
               onClick={() => void handleRemove()}
             />
           )}
-        </div>
-      </div>
+        </Flex>
+      </Flex>
     </Card>
   );
 }

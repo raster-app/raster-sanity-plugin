@@ -14,9 +14,6 @@ importers:
       '@raster/sdk':
         specifier: link:../raster-plugin-sdk/packages/sdk
         version: link:../raster-plugin-sdk/packages/sdk
-      '@raster/ui':
-        specifier: link:../raster-plugin-sdk/packages/ui
-        version: link:../raster-plugin-sdk/packages/ui
     devDependencies:
       '@eslint/js':
         specifier: ^9.19.0

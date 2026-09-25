@@ -1,7 +1,7 @@
 import { type SVGProps } from "react";
 
 /**
- * The seven icons this plugin uses, inlined.
+ * The eight icons this plugin uses, inlined.
  *
  * Not imported from `@sanity/icons`, and that is deliberate. Its export surface changed
  * incompatibly across the majors a Studio might have:
@@ -129,6 +129,17 @@ export function PublishIcon(props: IconProps) {
     <Svg name="publish" {...props}>
       <path d="M4.99997 5.50006H20M12.5 9.00005V20" {...STROKE} />
       <path d="M7.5 14L12.5 9.00006L17.5 14" {...STROKE} />
+    </Svg>
+  );
+}
+
+export function SearchIcon(props: IconProps) {
+  return (
+    <Svg name="search" {...props}>
+      <path
+        d="M15.0355 15.0355L20 20M16.5 11.5C16.5 14.2614 14.2614 16.5 11.5 16.5C8.73858 16.5 6.5 14.2614 6.5 11.5C6.5 8.73858 8.73858 6.5 11.5 6.5C14.2614 6.5 16.5 8.73858 16.5 11.5Z"
+        {...STROKE}
+      />
     </Svg>
   );
 }

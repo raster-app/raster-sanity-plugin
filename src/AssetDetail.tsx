@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { getFullSizeUrl, getThumbUrl, isReady } from "@raster/sdk";
 import { ClipboardIcon, LaunchIcon, PublishIcon, UploadIcon } from "./icons";
-import { Button, Card, Text } from "@sanity/ui";
+import { Box, Button, Card, Flex, Grid, Text } from "@sanity/ui";
 import { formatBytes, formatDate } from "./format";
 import { type RasterItem } from "./types";
 
@@ -75,12 +75,18 @@ export function AssetDetail({
 
   return (
     <Card padding={3} radius={2} border tone="transparent">
-      <div className="rstr-sanity-stack rstr-sanity-gap-3">
+      <Flex direction="column" gap={3}>
         {thumb !== undefined && (
-          <img className="rstr-sanity-detail__preview" src={thumb} alt="" />
+          <Card radius={2} border overflow="hidden">
+            <img
+              src={thumb}
+              alt=""
+              style={{ display: "block", width: "100%", maxHeight: 220, objectFit: "contain" }}
+            />
+          </Card>
         )}
 
-        <div className="rstr-sanity-stack rstr-sanity-gap-2">
+        <Flex direction="column" gap={2}>
           <Text size={1} weight="medium" textOverflow="ellipsis">
             {item.name ?? item.id}
           </Text>
@@ -89,17 +95,29 @@ export function AssetDetail({
               {description}
             </Text>
           )}
-        </div>
+        </Flex>
 
         {facts.length > 0 && (
-          <dl className="rstr-sanity-facts">
+          // Two columns so the values line up, and a long value wraps rather than widening.
+          <Grid
+            as="dl"
+            gapX={2}
+            gapY={2}
+            style={{ gridTemplateColumns: "auto minmax(0, 1fr)", margin: 0 }}
+          >
             {facts.map(([label, value]) => (
-              <div key={label} style={{ display: "contents" }}>
-                <dt>{label}</dt>
-                <dd>{value}</dd>
-              </div>
+              <Fragment key={label}>
+                <Box as="dt">
+                  <Text size={1} muted>
+                    {label}
+                  </Text>
+                </Box>
+                <Box as="dd" style={{ margin: 0, overflowWrap: "anywhere" }}>
+                  <Text size={1}>{value}</Text>
+                </Box>
+              </Fragment>
             ))}
-          </dl>
+          </Grid>
         )}
 
         {!ready && (
@@ -114,7 +132,7 @@ export function AssetDetail({
           </Text>
         )}
 
-        <div className="rstr-sanity-stack rstr-sanity-gap-2">
+        <Flex direction="column" gap={2}>
           {onPick !== undefined && (
             <Button
               mode="default"
@@ -157,7 +175,7 @@ export function AssetDetail({
             />
           )}
 
-          <div className="rstr-sanity-row rstr-sanity-gap-2">
+          <Flex gap={2} wrap="wrap">
             {fullSize !== null && (
               <Button
                 mode="bleed"
@@ -181,9 +199,9 @@ export function AssetDetail({
                 text="Open in Raster"
               />
             )}
-          </div>
-        </div>
-      </div>
+          </Flex>
+        </Flex>
+      </Flex>
     </Card>
   );
 }

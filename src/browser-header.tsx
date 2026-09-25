@@ -1,12 +1,14 @@
+import { Fragment } from "react";
 import {
   useSession,
   type AssetSearch,
   type Organization,
   type RasterNavigation,
 } from "@raster/react";
-import { Breadcrumb, OrganizationMenu, SearchBar, type Crumb } from "@raster/ui";
-import { Button } from "@sanity/ui";
-import { LeaveIcon, RefreshIcon, UploadIcon } from "./icons";
+import { Box, Button, Flex, Select, Text, TextInput } from "@sanity/ui";
+import { LeaveIcon, RefreshIcon, SearchIcon, UploadIcon } from "./icons";
+
+type Crumb = { key: string; label: string; onClick?: () => void };
 
 export type BrowserHeaderProps = {
   nav: RasterNavigation;
@@ -33,10 +35,14 @@ export function BrowserHeader({
   const { userName, isSignedIn, signOut } = useSession();
 
   /** Render-only values */
+  // With one organization there is nothing to switch to, so the trail starts with its name.
+  // With several, the select names it and the trail starts at its libraries.
+  const canSwitch = organizations.length > 1;
+
   const crumbs: Array<Crumb> = [
     {
       key: "organization",
-      label: organization?.name ?? "Raster",
+      label: canSwitch ? "Libraries" : (organization?.name ?? "Raster"),
       onClick: nav.library === null ? undefined : () => nav.openLibrary(null),
     },
   ];
@@ -59,14 +65,55 @@ export function BrowserHeader({
 
   return (
     <>
-      <div className="rstr-sanity-header">
-        <OrganizationMenu
-          organizations={organizations}
-          current={organization}
-          onSelect={(next) => nav.selectOrganization(next.id)}
-        />
-        <Breadcrumb crumbs={crumbs} />
-        <span className="rstr-sanity-header__spacer" />
+      <Flex align="center" gap={2} wrap="wrap">
+        {canSwitch && (
+          <Select
+            fontSize={1}
+            padding={2}
+            aria-label="Organization"
+            value={organization?.id ?? ""}
+            onChange={(event) => nav.selectOrganization(event.currentTarget.value)}
+          >
+            {organizations.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name ?? item.id}
+              </option>
+            ))}
+          </Select>
+        )}
+
+        <Flex as="nav" aria-label="Breadcrumb" align="center" gap={1} wrap="wrap">
+          {crumbs.map((crumb, index) => {
+            const isLast = index === crumbs.length - 1;
+            return (
+              <Fragment key={crumb.key}>
+                {index > 0 && (
+                  <Text size={1} muted aria-hidden="true">
+                    /
+                  </Text>
+                )}
+                {/* Where you already are is text, not a button that does nothing. */}
+                {isLast || crumb.onClick === undefined ? (
+                  <Box padding={2}>
+                    <Text size={1} weight="medium" aria-current={isLast ? "page" : undefined}>
+                      {crumb.label}
+                    </Text>
+                  </Box>
+                ) : (
+                  <Button
+                    mode="bleed"
+                    fontSize={1}
+                    padding={2}
+                    text={crumb.label}
+                    onClick={crumb.onClick}
+                  />
+                )}
+              </Fragment>
+            );
+          })}
+        </Flex>
+
+        <Box flex={1} />
 
         {onUpload !== undefined && (
           <Button
@@ -102,19 +149,31 @@ export function BrowserHeader({
           }
           onClick={() => void signOut()}
         />
-      </div>
+      </Flex>
 
       {nav.asset === null && nav.organizationId !== null && (
-        <SearchBar
-          value={nav.query}
-          onChange={nav.setQuery}
-          placeholder={
-            nav.library === null
-              ? `Search ${organization?.name ?? "this organization"}`
-              : `Search ${nav.library.name ?? "this library"}`
-          }
-          hint={searchHint}
-        />
+        <Flex direction="column" gap={2}>
+          {/* No debounce here: `useAssetSearch` already debounces, and twice feels laggy. */}
+          <TextInput
+            type="search"
+            icon={SearchIcon}
+            fontSize={1}
+            padding={2}
+            value={nav.query}
+            placeholder={
+              nav.library === null
+                ? `Search ${organization?.name ?? "this organization"}`
+                : `Search ${nav.library.name ?? "this library"}`
+            }
+            aria-label="Search"
+            onChange={(event) => nav.setQuery(event.currentTarget.value)}
+          />
+          {searchHint !== undefined && (
+            <Text size={1} muted aria-live="polite">
+              {searchHint}
+            </Text>
+          )}
+        </Flex>
       )}
     </>
   );

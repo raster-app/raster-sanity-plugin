@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useRasterClient, useSession } from "@raster/react";
-import { toUserMessage, type PkcePending } from "@raster/sdk";
-import { LoadingScreen, SignInPanel } from "@raster/ui";
-import { Card, Text } from "@sanity/ui";
+import { toUserMessage } from "@raster/sdk";
+import { Card, Flex, Text } from "@sanity/ui";
 import { useWorkspace } from "sanity";
 import { storagePrefix } from "./client";
+import { LoadingState } from "./loading-state";
+import { SignInPanel } from "./sign-in-panel";
 import { StudioKeySetup } from "./studio-key-setup";
 import { usePkceRedirect } from "./usePkceRedirect";
 import { type RasterConfig } from "./types";
@@ -76,14 +77,12 @@ export function RasterSignInGate({
     pkce.isCompleting
   ) {
     return (
-      <LoadingScreen
-        label={pkce.isCompleting ? "Finishing sign-in…" : "Connecting to Raster…"}
-      />
+      <LoadingState label={pkce.isCompleting ? "Finishing sign-in…" : "Connecting to Raster…"} />
     );
   }
 
   return (
-    <div className="rstr-sanity-stack rstr-sanity-gap-4 rstr-sanity-pad-4">
+    <Flex direction="column" gap={4} padding={4}>
       {configuredKey.status === "failed" && (
         <Card tone="critical" padding={3} radius={2} border>
           <Text size={1}>
@@ -99,22 +98,15 @@ export function RasterSignInGate({
       )}
 
       <SignInPanel
-        productName="Sanity Studio"
         allowApiKey={config.hideApiKeySignIn !== true}
         pkce={
           pkce.redirectUri === null
             ? undefined
-            : {
-                redirectUri: pkce.redirectUri,
-                // The panel hands back what must survive the navigation; where it goes and
-                // when we leave is the host's call, which is why this is a callback.
-                onReady: (authorizationUrl, pending) =>
-                  pkce.start(authorizationUrl, pending as PkcePending),
-              }
+            : { redirectUri: pkce.redirectUri, onReady: pkce.start }
         }
       />
 
       {allowStudioKeySetup && <StudioKeySetup studioKey={studioKey} />}
-    </div>
+    </Flex>
   );
 }

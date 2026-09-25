@@ -29,7 +29,6 @@ export default defineConfig({
         "@sanity/ui",
         "@raster/sdk",
         "@raster/react",
-        "@raster/ui",
       ],
       output: [
         {

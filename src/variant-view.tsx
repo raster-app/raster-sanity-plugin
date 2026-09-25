@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { type Asset, type AssetVariant, type UploadState } from "@raster/react";
-import { AssetGrid } from "@raster/ui";
-import { Text } from "@sanity/ui";
+import { Box, Flex, Text } from "@sanity/ui";
 import { AssetDetail } from "./AssetDetail";
+import { AssetGrid } from "./asset-grid";
 import { isImage, type RasterItem } from "./types";
 
 /**
@@ -68,8 +68,9 @@ export function VariantView({
   const selected = items.find((item) => item.id === selectedId) ?? asset;
 
   return (
-    <div className="rstr-sanity-detail">
-      <div className="rstr-sanity-stack rstr-sanity-gap-3">
+    // Variants beside the detail pane, which wraps below them when the pane is too narrow.
+    <Flex gap={4} wrap="wrap" align="flex-start">
+      <Flex direction="column" gap={3} flex={1} style={{ minWidth: 280 }}>
         <Text size={1} muted>
           {items.length === 1
             ? "This asset has no variants yet."
@@ -81,8 +82,9 @@ export function VariantView({
           defaultAssetId={asset.id}
           emptyMessage="Nothing to show."
         />
-      </div>
-      <AssetDetail
+      </Flex>
+      <Box style={{ flex: "0 1 280px" }}>
+        <AssetDetail
         item={selected}
         canPromote={selected.id !== asset.id && !isProcessing(selected)}
         onPromote={() => onPromote(selected as AssetVariant)}
@@ -91,7 +93,8 @@ export function VariantView({
         canPick={isImage(asset)}
         onUploadVariant={onUploadVariant}
         busy={busy}
-      />
-    </div>
+        />
+      </Box>
+    </Flex>
   );
 }
