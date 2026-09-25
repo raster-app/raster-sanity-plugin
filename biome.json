@@ -1,0 +1,65 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
+	"plugins": ["./biome-plugins/no-as-type-assertion.grit"],
+	"assist": {
+		"actions": {
+			"source": {
+				"organizeImports": {
+					"level": "off"
+				}
+			}
+		}
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"preset": "recommended",
+			"correctness": {
+				"noUnusedImports": "error",
+				"noUnusedVariables": "error",
+				"useExhaustiveDependencies": "warn",
+				"useHookAtTopLevel": "error"
+			},
+			"suspicious": {
+				"noExplicitAny": "error",
+				"noEmptyInterface": "off",
+				"noArrayIndexKey": "warn",
+				"noDocumentCookie": "warn",
+				"noTemplateCurlyInString": "warn"
+			},
+			"style": {
+				"noNonNullAssertion": "warn",
+				"useImportType": "warn"
+			}
+		}
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"indentWidth": 2,
+		"lineWidth": 100
+	},
+	"javascript": {
+		"formatter": {
+			"semicolons": "asNeeded",
+			"quoteStyle": "single",
+			"trailingCommas": "es5",
+			"bracketSameLine": false
+		}
+	},
+	"files": {
+		"includes": [
+			"**/*.ts",
+			"**/*.tsx",
+			"**/*.js",
+			"**/*.jsx",
+			"**/*.json",
+			"!**/node_modules",
+			"!**/dist",
+			"!**/.turbo",
+			"!.claude",
+			"!**/__generated__"
+		],
+		"ignoreUnknown": true
+	}
+}

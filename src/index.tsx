@@ -1,34 +1,44 @@
-import { definePlugin, type AssetSource, type Tool } from "sanity";
-import { RasterAssetSource } from "./RasterAssetSource";
-import { RasterConfig } from "./types";
-import { ImageIcon } from "@sanity/icons";
-import { RasterTool } from "./RasterTool";
+import { definePlugin, type AssetSource, type Tool } from 'sanity'
+import { icons } from '@sanity/icons'
+import { RasterAssetSource } from './raster-asset-source'
+import { RasterTool } from './raster-tool'
+import type { RasterConfig } from './types'
 
-// eslint-disable-next-line react-refresh/only-export-components
-export * from "./types";
+export * from './types'
 
-export const rasterPlugin = definePlugin<RasterConfig>((config) => {
-  const rasterSource: AssetSource = {
-    name: "raster",
-    title: "Raster",
-    component: (props) => <RasterAssetSource {...props} config={config} />,
-    icon: ImageIcon,
-  };
+/** Adds Raster as an asset source on every image field, and a Raster tool. */
+// biome-ignore lint/suspicious/noConfusingVoidType: `void` is what makes the argument optional, so `rasterPlugin()` works.
+export const rasterPlugin = definePlugin<RasterConfig | void>((config) => {
+	const settings: RasterConfig = config ?? {}
 
-  const rasterTool: Tool = {
-    name: "raster",
-    title: "Raster Assets",
-    icon: ImageIcon,
-    component: (props) => <RasterTool {...props} config={config} />,
-  };
+	// A 1.x config may still pass it.
+	if ('apiKey' in settings) {
+		console.warn(
+			'rasterPlugin: `apiKey` is no longer supported. Remove it, and save the key in the Raster tool instead.'
+		)
+	}
 
-  return {
-    name: "raster-asset-source",
-    form: {
-      image: {
-        assetSources: (prev) => [...prev, rasterSource],
-      },
-    },
-    tools: (prev) => [...prev, rasterTool],
-  };
-});
+	const rasterSource: AssetSource = {
+		name: 'raster',
+		title: 'Raster',
+		component: (props) => <RasterAssetSource {...props} config={settings} />,
+		icon: icons.image,
+	}
+
+	const rasterTool: Tool = {
+		name: 'raster',
+		title: 'Raster Assets',
+		icon: icons.image,
+		component: () => <RasterTool config={settings} />,
+	}
+
+	return {
+		name: 'raster-asset-source',
+		form: {
+			image: {
+				assetSources: (prev) => [...prev, rasterSource],
+			},
+		},
+		tools: (prev) => [...prev, rasterTool],
+	}
+})

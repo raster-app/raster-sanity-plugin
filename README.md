@@ -1,34 +1,63 @@
 # Sanity Plugin - Raster
 
-A Sanity Studio plugin that integrates [Raster](https://raster.app) - a modern Digital Asset Management (DAM) platform that helps teams organize, optimize, and deliver their media assets with powerful AI features and an intuitive interface.
+A Sanity Studio plugin for [Raster](https://raster.app), a digital asset management platform.
+Browse your Raster organizations, libraries and variants from inside Studio, and pick images
+straight into any image field.
+
+Built on the [Raster Plugin SDK](https://github.com/raster-app/raster-sdk) — the same client,
+OAuth flows and image renditions that power Raster's Figma plugin — with every screen drawn in
+`@sanity/ui`, so it looks and behaves like the rest of Studio.
 
 ## Features
 
-- 🖼️ Seamless integration with Raster DAM in Sanity Studio
-- 🔄 Direct asset selection from your Raster libraries
-- 🎯 Custom image field type (`raster.image`) for better type safety
-- 🎨 Modern UI that matches Sanity's design system
-- 📱 Responsive image preview and selection
+- **Asset source on every image field** — pick an image from Raster without leaving the
+  document, and the Raster asset's id and app link are recorded on the Sanity asset.
+- **A Raster tool** for browsing libraries on their own, with the whole pane to work in.
+- **Sign in from inside Studio** with the device code flow, or connect everyone with an
+  organization API key an admin saves once. No credentials in your Studio config.
+- **Organization switcher** for a credential that reaches more than one.
+- **Full-text search** across an organization, or narrowed to the open library.
+- **Variants** — browse an asset's crops and adjustments, and promote one to be the default.
+- **Upload** by button or drag-and-drop, as a new asset or as a variant of an existing one.
+- **Infinite paging, blurhash placeholders and reserved aspect ratios**, so the grid does not
+  reflow as images land.
+- **Native Studio UI**, built from `@sanity/ui`, so it follows the Studio's theme and colour
+  scheme.
 
 ## Installation
 
 ```bash
 npm install @raster-app/sanity-plugin-raster
 # or
-yarn add @raster-app/sanity-plugin-raster
-# or
 pnpm add @raster-app/sanity-plugin-raster
 ```
 
-## Configuration
+## Compatibility
 
-### 1. Get Your Raster Credentials
+| | Supported |
+| --- | --- |
+| `sanity` | 4.x, 5.x, 6.x |
+| `@sanity/ui` | 3.x, 4.x |
+| `react` | 19 |
 
-1. Sign up for a Raster account at [raster.app](https://raster.app)
-2. Get your API key from your Raster dashboard
-3. Note your organization ID
+Upgrading from 1.x, which supported Sanity v3? See the [migration notes](CHANGELOG.md#migrating-from-1x).
 
-### 2. Add the Plugin to Your Sanity Config
+`@sanity/ui` is a **peer dependency**, not a dependency — it carries the Studio's theme through
+React context, and a second copy means a component that cannot read it. Every studio already has
+it by way of `sanity`, so there is nothing to install.
+
+The plugin only uses components exported from the package root in both 3.x and 4.x: `Badge`,
+`Box`, `Button`, `Card`, `Dialog`, `Flex`, `Grid`, `Select`, `Spinner`, `Text` and
+`TextInput`, laid out with `Flex` and `Grid`'s `gap`, which both versions accept. Some things
+are avoided on purpose:
+
+- **`Stack` and `Inline`**, whose spacing prop was renamed `space` → `gap` between 3.0 and 4.0
+  with no spelling valid in both. `<Flex direction="column" gap={3}>` does the same job.
+- **`MenuButton`, `Menu`, `Breadcrumbs`, `Tooltip`, `Popover` and `Code`**, which 4.x moved
+  to subpaths that 3.x does not have. The organization switcher is a `Select`, and the
+  breadcrumb is `Flex` with `Button` and `Text`.
+
+## Setup
 
 ```typescript
 // sanity.config.ts
@@ -37,19 +66,53 @@ import { rasterPlugin } from "@raster-app/sanity-plugin-raster";
 
 export default defineConfig({
   // ...other config
-  plugins: [
-    // ...other plugins
-    rasterPlugin({
-      apiKey: "your-raster-api-key",
-      orgId: "your-organization-id",
-    }),
-  ],
+  plugins: [rasterPlugin()],
 });
 ```
 
+That is the whole setup. The first time an editor opens the Raster tool or picker they are
+asked to connect their Raster account; the session is then remembered in that browser.
+
+### Configuration
+
+The only option is optional:
+
+```typescript
+rasterPlugin({
+  // Pin the plugin to one organization. The switcher is then hidden.
+  orgId: "acme",
+});
+```
+
+### An API key for everyone
+
+Instead of having each editor sign in, an administrator can save an organization API key in
+the Raster tool: sign out if needed, and use **Connect everyone with an API key** on the
+sign-in screen. Editors are then connected without signing in. The key is read on every load
+and kept in memory rather than in editors' browsers, so a rotated key takes effect on the next
+load.
+
+The key is stored in the dataset, in a document with the id `secrets.raster`. Sanity only
+returns documents with a dot in their id to signed-in users, so it is not public and does not
+ship in the Studio bundle. It is not hidden from your team, though:
+
+- **Anyone signed in to the Studio who can read documents can read the key.** Custom roles,
+  available on Enterprise plans, can limit that.
+- **Dataset exports include it.**
+
+So create the key for this Studio alone, with access to only the libraries it needs.
+
+### Where the session is stored
+
+The credential is kept in `localStorage`, per browser and per Studio workspace, so editors
+sign in once rather than on every reload. It also means **any script or plugin running on the
+Studio's origin can read the token** — the usual trade for an admin UI, but worth making
+deliberately. Signing out clears it and asks Raster to revoke the session, and an editor can
+also revoke it in Raster under **Settings > Connected apps**.
+
 ## Usage
 
-### Basic Schema Example
+The plugin adds itself to every `image` field, so no schema changes are needed:
 
 ```typescript
 // schemas/blogPost.ts
@@ -60,106 +123,99 @@ export default defineType({
   title: "Blog Post",
   type: "document",
   fields: [
-    {
-      name: "title",
-      title: "Title",
-      type: "string",
-      validation: (Rule) => Rule.required(),
-    },
-    {
-      name: "description",
-      title: "Description",
-      type: "text",
-      rows: 3,
-    },
-    {
-      name: "featuredImage",
-      title: "Featured Image",
-      type: "image",
-      description: "Select an image from Raster",
-    },
+    { name: "title", type: "string", validation: (Rule) => Rule.required() },
+    { name: "featuredImage", type: "image", title: "Featured Image" },
   ],
 });
 ```
 
-### Using the Image in Your Frontend
+Choosing "Raster" in the field's source menu opens the picker. Sanity fetches the chosen image
+and stores it as a normal `sanity.imageAsset`, so everything downstream — hotspot and crop,
+the image pipeline, GROQ projections, `next-sanity-image` — works unchanged:
 
-The image field will store the URL and alt text. Here's how the data structure looks:
-
-```typescript
-interface RasterImage {
-  _type: "image";
-  asset: {
-    url: string;
-  };
-  alt?: string;
+```groq
+*[_type == "blogPost"][0]{
+  title,
+  featuredImage{
+    asset->{ url, originalFilename, source }
+  }
 }
 ```
 
-Example usage in Next.js:
+`source` carries the provenance: `{ name: "raster", id: "<raster asset id>", url: "<link into
+Raster>" }`. That is what gets an editor from an image in a document back to the asset it came
+from.
 
-```tsx
-import Image from "next/image";
+### Promoting a variant
 
-function BlogPost({ post }) {
-  return (
-    <article>
-      <h1>{post.title}</h1>
-      {post.featuredImage && (
-        <Image
-          src={post.featuredImage.asset.url}
-          alt={post.featuredImage.alt || ""}
-          width={1200}
-          height={630}
-        />
-      )}
-      <p>{post.description}</p>
-    </article>
-  );
-}
-```
+Sanity keeps the file it copied when the image was picked. Promoting a variant in Raster
+doesn't change documents; to update one, pick the image again.
 
 ## Development
 
-1. Clone this repository
-2. Install dependencies with `pnpm install`
-3. Run `pnpm build` to build the plugin
-4. Link the plugin to your Sanity studio for testing:
+The plugin is built against the [Raster Plugin SDK](https://github.com/raster-app/raster-sdk)
+packages: `@raster/sdk` (the REST client, OAuth and image helpers) and `@raster/react`
+(provider and hooks). The SDK is headless; everything on screen is this plugin's, in
+`@sanity/ui`.
 
-   ```bash
-   # In the plugin directory
-   pnpm link-watch
+> **While the SDK is unpublished**, the two `@raster/*` dependencies point at a sibling
+> checkout with `link:../raster-plugin-sdk/...`, so `pnpm install` expects
+> `raster-plugin-sdk` next to this repository with its packages built (`pnpm build` there).
+> Replace them with the published ranges before releasing.
 
-   # In your Sanity studio directory
-   pnpm yalc add @raster-app/sanity-plugin-raster
-   pnpm install
-   ```
+```bash
+pnpm install
+pnpm typecheck
+pnpm check   # Biome: format and lint, applying safe fixes
+pnpm build
+```
+
+To try it in a real Studio:
+
+```bash
+# In the plugin directory
+pnpm link-watch
+
+# In your Sanity studio directory
+pnpm yalc add @raster-app/sanity-plugin-raster
+pnpm install
+```
+
+### How the pieces fit
+
+| File                      | What it does                                                             |
+| ------------------------- | ------------------------------------------------------------------------ |
+| `src/index.tsx`           | The plugin: the asset source and the tool.                               |
+| `src/client.ts`           | One `RasterClient` per Studio workspace, with Studio's host adapters.     |
+| `src/raster-studio-provider.tsx` | The workspace's client, for the `@raster/react` hooks.             |
+| `src/raster-sign-in-gate.tsx` | Connects with the studio key, or shows the sign-in screen.            |
+| `src/sign-in-panel.tsx`   | The device code sign-in.                                                 |
+| `src/use-studio-key.ts`   | Reads and writes that key in the `secrets.raster` document.              |
+| `src/studio-key-setup.tsx` | Where an administrator saves or removes it, in the tool.                |
+| `src/raster-browser.tsx`   | The organization → library → asset browser, shared by tool and picker.   |
+| `src/browser-header.tsx`  | The switcher, breadcrumb, actions and search box.                        |
+| `src/library-list.tsx`    | An organization's libraries.                                             |
+| `src/asset-grid.tsx`      | The asset grid, with infinite paging and blurhash placeholders.          |
+| `src/variant-view.tsx`    | One asset's default and variants, with the detail pane.                  |
+| `src/use-browser-actions.ts` | Upload and promote, and the busy, error and notice they report.       |
+| `src/asset-detail.tsx`     | The selected asset's facts and actions.                                  |
+| `src/loading-state.tsx`   | A spinner with a label.                                                  |
+
+There is no stylesheet: layout is `Flex`, `Grid` and `Box`, and colour comes from `Card` tones,
+so the plugin follows the Studio's theme without a token map.
 
 ## Contributing
 
-Contributions are welcome! Please read our [contributing guidelines](CONTRIBUTING.md) to get started.
+Contributions are welcome.
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+3. Commit your changes
+4. Open a Pull Request
 
 ## License
 
 MIT © Monogram Inc.
-
-## About Raster
-
-[Raster](https://raster.app) is a modern Digital Asset Management (DAM) platform that helps teams organize, optimize, and deliver their media assets. With features like AI-powered search, automatic tagging, and advanced image optimization, Raster makes it easy to manage your digital assets at scale.
-
-Key features:
-
-- AI-powered asset organization
-- Advanced image optimization
-- Intuitive asset management
-- Powerful API and integrations
-- Team collaboration tools
 
 ## Support
 

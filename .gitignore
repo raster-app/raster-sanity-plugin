@@ -30,3 +30,5 @@ yalc.lock
 # Other
 plugin-examples
 .cursor
+# TypeScript build cache
+*.tsbuildinfo
