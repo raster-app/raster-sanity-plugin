@@ -119,20 +119,20 @@ function Browser({
     return libraries.data?.find((library) => library.id === libraryId)?.name ?? null;
   }
 
-  function handleTile(item: RasterItem) {
+  function handleTile(item: Asset) {
     // The tool browses everything; the picker fills an image field, so a video or PDF is a
     // tile it ignores rather than one that fails in Sanity after the dialog has closed.
-    if (onPick !== undefined && !isImage(item as Asset)) return;
+    if (onPick !== undefined && !isImage(item)) return;
 
     // In the picker, an asset with no variants is one click: there is nothing to choose
     // between, and making an editor open it first would be ceremony.
-    const hasVariants = "variants" in item && (item.variants?.length ?? 0) > 0;
+    const hasVariants = (item.variants?.length ?? 0) > 0;
     if (onPick !== undefined && !hasVariants) {
       // Mid-promote, the asset's URL may still serve the previous default.
       if (actions.busy !== "promote") onPick(item);
       return;
     }
-    nav.openAsset(item as Asset);
+    nav.openAsset(item);
   }
 
   function handleDrop(event: DragEvent<HTMLDivElement>) {
@@ -213,7 +213,8 @@ function Browser({
           // `dragleave` bubbles from every child the pointer crosses, so leaving a tile for
           // the tile beside it would flicker the overlay off and on. Only a pointer that has
           // actually left this element counts.
-          if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
+          const next = event.relatedTarget;
+          if (next instanceof Node && event.currentTarget.contains(next)) return;
           setIsDropping(false);
         }}
         onDrop={handleDrop}
@@ -243,12 +244,12 @@ function Browser({
             error={search.error}
             hasMore={search.hasMore}
             onLoadMore={search.loadMore}
-            onSelect={(item) => handleTile(item as RasterItem)}
+            onSelect={handleTile}
             // A search from the library list spans every library, so a hit's own library is
             // the one thing a thumbnail cannot say.
             badgeFor={
               nav.library === null
-                ? (item) => libraryName((item as Asset).libraryId)
+                ? (item) => libraryName(item.libraryId)
                 : undefined
             }
             emptyMessage={`Nothing in ${organization?.name ?? "Raster"} matches “${search.query}”.`}
@@ -279,7 +280,7 @@ function Browser({
             error={assets.error}
             hasMore={assets.hasMore}
             onLoadMore={assets.loadMore}
-            onSelect={(item) => handleTile(item as RasterItem)}
+            onSelect={handleTile}
             emptyMessage={
               actions.canUpload
                 ? "This library is empty. Drop an image here to upload it."

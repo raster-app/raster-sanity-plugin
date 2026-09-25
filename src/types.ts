@@ -9,6 +9,11 @@ export interface RasterConfig {
 /** A top-level asset or one of its variants. */
 export type RasterItem = Asset | AssetVariant;
 
+/** Only a top-level asset belongs to a library. */
+export function isVariant(item: RasterItem): item is AssetVariant {
+  return !("libraryId" in item);
+}
+
 /** Libraries also hold video and PDF. Variants carry no type, so pass their asset. */
 export function isImage(asset: Asset): boolean {
   return asset.contentType?.startsWith("image/") === true;

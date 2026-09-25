@@ -3,16 +3,16 @@ import { getBlurhashPlaceholder, getThumbUrl, isReady, type DisplayAsset } from 
 import { Badge, Box, Card, Flex, Grid, Text } from "@sanity/ui";
 import { LoadingState } from "./loading-state";
 
-export type AssetGridProps = {
+export type AssetGridProps<T extends DisplayAsset> = {
   /** Null means "not loaded yet", which is not the same as an empty library. */
-  assets: Array<DisplayAsset> | null;
-  onSelect?: (asset: DisplayAsset) => void;
+  assets: Array<T> | null;
+  onSelect?: (asset: T) => void;
   isLoading?: boolean;
   error?: string | null;
   hasMore?: boolean;
   onLoadMore?: () => void;
   /** Per-asset badge: the hit's library, when a search spans several. */
-  badgeFor?: (asset: DisplayAsset) => string | null;
+  badgeFor?: (asset: T) => string | null;
   /** Marks one asset as the current default. */
   defaultAssetId?: string | null;
   emptyMessage?: ReactNode;
@@ -23,7 +23,7 @@ export type AssetGridProps = {
  * sentinel after the last row rather than a button, because these panels are narrow and a
  * "load more" button is most of a row.
  */
-export function AssetGrid({
+export function AssetGrid<T extends DisplayAsset>({
   assets,
   onSelect,
   isLoading = false,
@@ -33,7 +33,7 @@ export function AssetGrid({
   badgeFor,
   defaultAssetId,
   emptyMessage = "Nothing here yet.",
-}: AssetGridProps) {
+}: AssetGridProps<T>) {
   /** Refs */
   const sentinelRef = useRef<HTMLDivElement>(null);
   // `onLoadMore` is usually an inline arrow. Held in a ref so the observer below is not torn
@@ -104,14 +104,14 @@ export function AssetGrid({
  * does not reflow as images land, and paints the blurhash underneath so it is never an empty
  * box. An asset still processing is shown but disabled.
  */
-function AssetTile({
+function AssetTile<T extends DisplayAsset>({
   asset,
   onSelect,
   badge,
   isDefault,
 }: {
-  asset: DisplayAsset;
-  onSelect?: (asset: DisplayAsset) => void;
+  asset: T;
+  onSelect?: (asset: T) => void;
   badge: string | null;
   isDefault: boolean;
 }) {

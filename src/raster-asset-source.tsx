@@ -30,6 +30,7 @@ export function RasterAssetSource(props: RasterAssetSourceProps) {
       const asset: AssetFromSource = {
         kind: "url",
         value: url,
+        // biome-ignore lint/plugin: Sanity types this as a stored `ImageAsset`; Studio fills in the rest once it has the file.
         assetDocumentProps: {
           originalFilename: item.name ?? undefined,
           source: {
@@ -42,7 +43,6 @@ export function RasterAssetSource(props: RasterAssetSourceProps) {
           ...("description" in item && item.description != null && item.description !== ""
             ? { description: item.description }
             : {}),
-          // Studio fills in the rest of the `ImageAsset` once it has the file.
         } as AssetFromSource["assetDocumentProps"],
       };
 
