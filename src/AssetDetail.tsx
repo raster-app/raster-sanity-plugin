@@ -112,7 +112,9 @@ export function AssetDetail({
               tone="primary"
               fontSize={1}
               padding={3}
-              disabled={!ready}
+              // Until a promote finishes, the asset's URL may still serve the previous default,
+              // and that is what Sanity would fetch and store.
+              disabled={!ready || busy === "promote"}
               onClick={() => onPick(item)}
               text={pickLabel}
             />

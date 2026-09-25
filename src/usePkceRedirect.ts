@@ -86,6 +86,7 @@ export function usePkceRedirect(options: { enabled: boolean; storagePrefix: stri
           callbackUrl: window.location.href,
         });
       } catch (caught) {
+        console.error(caught);
         setError(toUserMessage(caught));
       } finally {
         finish();
@@ -97,7 +98,8 @@ export function usePkceRedirect(options: { enabled: boolean; storagePrefix: stri
     (authorizationUrl: string, pending: PkcePending) => {
       try {
         window.sessionStorage.setItem(pendingKey, JSON.stringify(pending));
-      } catch {
+      } catch (caught) {
+        console.error(caught);
         // Blocked storage would mean coming back with no verifier to finish the exchange, so
         // this is a real failure rather than a lost convenience: say so instead of leaving.
         setError("This browser would not let the plugin remember the sign-in. Try the code flow.");

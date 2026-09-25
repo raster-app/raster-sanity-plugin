@@ -192,6 +192,9 @@ pnpm install
 | `src/RasterStudioProvider.tsx` | The provider, Sanity's Button and Input in the shared components' slots, and the themed root. |
 | `src/RasterSignInGate.tsx` | The three ways in, and the configured API key.                           |
 | `src/RasterBrowser.tsx`   | The organization → library → asset browser, shared by tool and picker.   |
+| `src/browser-header.tsx`  | The switcher, breadcrumb, actions and search box.                        |
+| `src/variant-view.tsx`    | One asset's default and variants, with the detail pane.                  |
+| `src/use-browser-actions.ts` | Upload and promote, and the busy, error and notice they report.       |
 | `src/AssetDetail.tsx`     | The selected asset's facts and actions.                                  |
 | `src/theme/sanity.css`    | The `--raster-*` token contract mapped onto Sanity UI's `--card-*`.      |
 

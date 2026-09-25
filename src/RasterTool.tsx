@@ -8,7 +8,10 @@ import { type RasterToolProps } from "./types";
 const RasterBrowser = React.lazy(() =>
   import("./RasterBrowser")
     .then((module) => ({ default: module.RasterBrowser }))
-    .catch(() => ({ default: () => <RasterBrowserFallback label="Raster failed to load." /> }))
+    .catch((caught: unknown) => {
+      console.error(caught);
+      return { default: () => <RasterBrowserFallback label="Raster failed to load." /> };
+    })
 );
 
 /**

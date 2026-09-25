@@ -51,8 +51,10 @@ export function RasterSignInGate({
     setConfiguredKey({ status: "connecting" });
     client.auth.connect({ apiKey }).then(
       () => setConfiguredKey({ status: "idle" }),
-      (caught: unknown) =>
-        setConfiguredKey({ status: "failed", message: toUserMessage(caught) })
+      (caught: unknown) => {
+        console.error(caught);
+        setConfiguredKey({ status: "failed", message: toUserMessage(caught) });
+      }
     );
   }, [client, config.apiKey, credentials, isConfigured]);
 

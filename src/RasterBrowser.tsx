@@ -1,39 +1,22 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
+import { useMemo, useState, type DragEvent } from "react";
 import {
   useAssetSearch,
-  useAssetUpload,
   useAssets,
   useLibraries,
   useOrganizations,
-  useRasterClient,
   useRasterNavigation,
   useSession,
 } from "@raster/react";
-import { toUserMessage, type Asset, type AssetVariant } from "@raster/sdk";
-import {
-  AssetGrid,
-  Breadcrumb,
-  LibraryList,
-  LoadingScreen,
-  OrganizationMenu,
-  SearchBar,
-  type Crumb,
-} from "@raster/ui";
-import { LeaveIcon, RefreshIcon, UploadIcon } from "./icons";
+import { type Asset } from "@raster/sdk";
+import { AssetGrid, LibraryList, LoadingScreen } from "@raster/ui";
 import { Button, Card, Text } from "@sanity/ui";
-import { AssetDetail } from "./AssetDetail";
+import { BrowserHeader } from "./browser-header";
 import { pinnedOrganizationId } from "./client";
+import { LeaveIcon } from "./icons";
 import { RasterSignInGate } from "./RasterSignInGate";
 import { type RasterConfig, type RasterItem } from "./types";
-
-/**
- * Whether this is the optimistic placeholder for a variant Raster has not finished making.
- * The flag is client-only and lives on `AssetVariant`, so it has to be narrowed to rather
- * than read off the union.
- */
-function isProcessing(item: RasterItem): boolean {
-  return "processing" in item && item.processing === true;
-}
+import { useBrowserActions } from "./use-browser-actions";
+import { VariantView } from "./variant-view";
 
 export type RasterBrowserProps = {
   config: RasterConfig;
@@ -80,9 +63,10 @@ function Browser({
   onPick?: (item: RasterItem) => void;
   pickLabel: string;
 }) {
-  const client = useRasterClient();
-  const { userName, isSignedIn, signOut } = useSession();
+  /** Context */
+  const { signOut } = useSession();
 
+  /** Data */
   const allOrganizations = useOrganizations();
   const pinned = pinnedOrganizationId(config);
 
@@ -119,224 +103,55 @@ function Browser({
     nav.refreshNonce
   );
 
-  const upload = useAssetUpload();
+  const actions = useBrowserActions({ nav, assets });
 
-  const [selected, setSelected] = useState<RasterItem | null>(null);
-  const [busy, setBusy] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  /** State */
   const [isDropping, setIsDropping] = useState(false);
 
-  // Opening an asset starts with the asset itself selected, so the detail pane is never empty
-  // and the default is what an editor sees first.
-  useEffect(() => {
-    setSelected(nav.asset);
-  }, [nav.asset]);
+  /** Derived */
+  const pinnedMissing =
+    pinned !== null && allOrganizations.data !== null && (organizations?.length ?? 0) === 0;
 
-  /** The library an asset belongs to — a search hit's is not the one being browsed. */
-  const assetLibraryId = nav.asset?.libraryId ?? nav.library?.id ?? null;
-
-  const refresh = useCallback(() => {
+  /** Handlers */
+  function refresh() {
     nav.refresh();
     allOrganizations.reload();
     libraries.reload();
     assets.reload();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nav.refresh, allOrganizations.reload, libraries.reload, assets.reload]);
+    actions.clearNotice();
+  }
 
-  // ---- upload ---------------------------------------------------------------------------
+  function libraryName(libraryId: string | null | undefined) {
+    return libraries.data?.find((library) => library.id === libraryId)?.name ?? null;
+  }
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  // Which asset an upload should attach to as a variant, or null for a new top-level asset.
-  const uploadParentRef = useRef<string | null>(null);
-
-  const openFilePicker = useCallback((parentId: string | null) => {
-    uploadParentRef.current = parentId;
-    fileInputRef.current?.click();
-  }, []);
-
-  const uploadFile = useCallback(
-    async (file: File, parentId: string | null) => {
-      // An asset opened from a search hit belongs to a library other than the one being
-      // browsed — and may be the only library in play, since a search can start from the list.
-      const libraryId = assetLibraryId;
-      if (nav.organizationId === null || libraryId === null) return;
-
-      setError(null);
-      const finished = await upload.upload({
-        organizationId: nav.organizationId,
-        libraryId,
-        parentId,
-        source: file,
-      });
-
-      // Null means processing outlived the poll schedule — "not yet", not a failure. The
-      // upload itself is done, so refreshing later will find it.
-      if (finished === null) return;
-
-      if (parentId === null) {
-        // Listings lag behind processing by a few seconds, so show it now rather than reload
-        // and appear to have lost it. A later reload overwrites this with the server's order.
-        assets.setAssets((current) => [finished, ...current.filter((a) => a.id !== finished.id)]);
-        return;
-      }
-
-      // A new variant reshapes the parent, so take the parent back from the server rather
-      // than splice a guess into the list we are holding.
-      try {
-        const parent = await client.assets.get({
-          organizationId: nav.organizationId,
-          libraryId,
-          assetId: parentId,
-        });
-        nav.openAsset(parent);
-        assets.setAssets((current) => current.map((a) => (a.id === parent.id ? parent : a)));
-      } catch (caught) {
-        setError(toUserMessage(caught));
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [client, nav.organizationId, nav.openAsset, assetLibraryId, upload.upload, assets.setAssets]
-  );
-
-  // Somewhere to upload to: a library being browsed, or the library the open asset came from.
-  const canUpload = nav.organizationId !== null && assetLibraryId !== null;
-
-  const onDrop = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDropping(false);
-    const file = event.dataTransfer?.files?.[0];
-    if (file === undefined || !canUpload) return;
-    void uploadFile(file, nav.asset?.id ?? null);
-  };
-
-  // ---- promote --------------------------------------------------------------------------
-
-  const promote = useCallback(
-    async (variant: AssetVariant) => {
-      const asset = nav.asset;
-      if (asset === null || nav.organizationId === null || assetLibraryId === null) return;
-
-      setBusy("promote");
-      setError(null);
-      try {
-        await client.assets.promote({
-          organizationId: nav.organizationId,
-          libraryId: assetLibraryId,
-          assetId: asset.id,
-          variantId: variant.id,
-        });
-
-        // Promote swaps the file behind a stable URL, so the grid behind this view would keep
-        // painting the old bytes from cache. The display override shows the promoted image at
-        // once, and the version bump is what stops the cache winning.
-        assets.setAssets((current) =>
-          current.map((item) =>
-            item.id === asset.id
-              ? {
-                  ...item,
-                  displayUrl: variant.url,
-                  displaySizes: variant.sizes,
-                  contentVersion: (item.contentVersion ?? 0) + 1,
-                }
-              : item
-          )
-        );
-
-        // The previous default is preserved as a new variant and the promoted one's entry
-        // goes away, so the variant list we are holding no longer matches. Refetch.
-        const fresh = await client.assets.get({
-          organizationId: nav.organizationId,
-          libraryId: assetLibraryId,
-          assetId: asset.id,
-        });
-        nav.openAsset(fresh);
-      } catch (caught) {
-        setError(toUserMessage(caught));
-      } finally {
-        setBusy(null);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [client, nav.asset, nav.organizationId, nav.openAsset, assetLibraryId, assets.setAssets]
-  );
-
-  // ---- what the grid shows ---------------------------------------------------------------
-
-  const libraryName = useCallback(
-    (libraryId: string | null | undefined) =>
-      libraries.data?.find((library) => library.id === libraryId)?.name ?? null,
-    [libraries.data]
-  );
-
-  /** The asset's default first, then its variants, then a placeholder for one being made. */
-  const variantItems = useMemo<Array<RasterItem>>(() => {
-    if (nav.asset === null) return [];
-    const items: Array<RasterItem> = [nav.asset, ...(nav.asset.variants ?? [])];
-
-    if (upload.state.status === "processing" && upload.state.asset.parentId === nav.asset.id) {
-      const pending = upload.state.asset;
-      // `processing` is the SDK's flag for exactly this: a tile that should be visible and
-      // shaped like an asset, but not selectable until Raster has produced the image.
-      items.push({
-        id: pending.id,
-        parentId: pending.parentId,
-        name: pending.name,
-        url: pending.url,
-        sizes: null,
-        width: null,
-        height: null,
-        appUrl: pending.appUrl,
-        processing: true,
-      });
-    }
-    return items;
-  }, [nav.asset, upload.state]);
-
-  const handleTile = (item: RasterItem) => {
-    // In the asset view a click chooses which version the detail pane is about.
-    if (nav.asset !== null) {
-      setSelected(item);
-      return;
-    }
+  function handleTile(item: RasterItem) {
     // In the picker, an asset with no variants is one click: there is nothing to choose
     // between, and making an editor open it first would be ceremony.
     const hasVariants = "variants" in item && (item.variants?.length ?? 0) > 0;
     if (onPick !== undefined && !hasVariants) {
-      onPick(item);
+      // Mid-promote, the asset's URL may still serve the previous default.
+      if (actions.busy !== "promote") onPick(item);
       return;
     }
     nav.openAsset(item as Asset);
-  };
-
-  // ---- chrome ---------------------------------------------------------------------------
-
-  const crumbs: Array<Crumb> = [
-    {
-      key: "organization",
-      label: organization?.name ?? "Raster",
-      onClick: nav.library === null ? undefined : () => nav.openLibrary(null),
-    },
-  ];
-  if (nav.library !== null) {
-    crumbs.push({
-      key: "library",
-      label: nav.library.name ?? "Library",
-      onClick: nav.asset === null ? undefined : () => nav.openAsset(null),
-    });
-  }
-  if (nav.asset !== null) {
-    crumbs.push({ key: "asset", label: nav.asset.name ?? "Asset" });
   }
 
-  const pinnedMissing =
-    pinned !== null && allOrganizations.data !== null && (organizations?.length ?? 0) === 0;
+  function handleDrop(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    setIsDropping(false);
+    const file = event.dataTransfer?.files?.[0];
+    if (file === undefined || !actions.canUpload) return;
+    void actions.uploadFile(file, nav.asset?.id ?? null);
+  }
 
+  /** Early returns */
   if (pinnedMissing) {
     return (
       <div className="rstr-sanity-stack rstr-sanity-gap-4 rstr-sanity-pad-4">
         <Card tone="critical" padding={3} radius={2} border>
           <Text size={1}>
-            This Raster credential cannot reach the organization <code>{pinned}</code> that this
+            This Raster account can't reach the organization <code>{pinned}</code> that this
             studio is configured for.
           </Text>
         </Card>
@@ -351,92 +166,44 @@ function Browser({
     return <LoadingScreen label="Loading your Raster libraries…" />;
   }
 
-  const searchHint = search.active
-    ? search.isSearching
-      ? "Searching…"
-      : `${search.found} ${search.found === 1 ? "result" : "results"}`
-    : undefined;
+  /** Render-only values */
+  const { uploadState } = actions;
+  const errorMessage = actions.error ?? (uploadState.status === "error" ? uploadState.message : null);
+  const progress =
+    uploadState.status === "uploading"
+      ? "Uploading to Raster…"
+      : uploadState.status === "processing"
+        ? `Raster is processing ${uploadState.asset.name ?? "the upload"}. It will appear in a moment.`
+        : actions.notice;
 
   return (
     <>
-      <div className="rstr-sanity-header">
-        <OrganizationMenu
-          organizations={organizations}
-          current={organization}
-          onSelect={(next) => nav.selectOrganization(next.id)}
-        />
-        <Breadcrumb crumbs={crumbs} />
-        <span className="rstr-sanity-header__spacer" />
+      <BrowserHeader
+        nav={nav}
+        organizations={organizations}
+        organization={organization}
+        search={search}
+        onUpload={actions.canUpload ? () => actions.openFilePicker(nav.asset?.id ?? null) : undefined}
+        isUploading={uploadState.status === "uploading"}
+        onRefresh={refresh}
+      />
 
-        {canUpload && (
-          <Button
-            mode="ghost"
-            fontSize={1}
-            padding={2}
-            icon={UploadIcon}
-            text={nav.asset === null ? "Upload" : "Add a variant"}
-            disabled={upload.state.status === "uploading"}
-            loading={upload.state.status === "uploading"}
-            onClick={() => openFilePicker(nav.asset?.id ?? null)}
-          />
-        )}
-        <Button
-          mode="bleed"
-          fontSize={1}
-          padding={2}
-          icon={RefreshIcon}
-          title="Refresh"
-          aria-label="Refresh"
-          onClick={refresh}
-        />
-        <Button
-          mode="bleed"
-          fontSize={1}
-          padding={2}
-          icon={LeaveIcon}
-          text="Sign out"
-          title={
-            isSignedIn
-              ? `Signed in as ${userName ?? "your Raster account"}`
-              : "Connected with an organization API key"
-          }
-          onClick={() => void signOut()}
-        />
-      </div>
-
-      {nav.asset === null && nav.organizationId !== null && (
-        <SearchBar
-          value={nav.query}
-          onChange={nav.setQuery}
-          placeholder={
-            nav.library === null
-              ? `Search ${organization?.name ?? "this organization"}`
-              : `Search ${nav.library.name ?? "this library"}`
-          }
-          hint={searchHint}
-        />
-      )}
-
-      {(error !== null || upload.state.status === "error") && (
+      {errorMessage !== null && (
         <Card tone="critical" padding={3} radius={2} border>
-          <Text size={1}>{error ?? (upload.state.status === "error" ? upload.state.message : "")}</Text>
+          <Text size={1}>{errorMessage}</Text>
         </Card>
       )}
 
-      {(upload.state.status === "uploading" || upload.state.status === "processing") && (
+      {progress !== null && (
         <Card tone="primary" padding={3} radius={2} border>
-          <Text size={1}>
-            {upload.state.status === "uploading"
-              ? "Uploading to Raster…"
-              : `Raster is processing ${upload.state.asset.name ?? "the upload"}. It will appear in a moment.`}
-          </Text>
+          <Text size={1}>{progress}</Text>
         </Card>
       )}
 
       <div
         className="rstr-sanity-browser__body"
         onDragOver={(event) => {
-          if (!canUpload) return;
+          if (!actions.canUpload) return;
           event.preventDefault();
           setIsDropping(true);
         }}
@@ -447,7 +214,7 @@ function Browser({
           if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
           setIsDropping(false);
         }}
-        onDrop={onDrop}
+        onDrop={handleDrop}
       >
         {isDropping && (
           <div className="rstr-sanity-browser__drop">
@@ -482,36 +249,17 @@ function Browser({
             emptyMessage="No libraries in this organization yet."
           />
         ) : nav.asset !== null ? (
-          <div className="rstr-sanity-detail">
-            <div className="rstr-sanity-stack rstr-sanity-gap-3">
-              <Text size={1} muted>
-                {variantItems.length === 1
-                  ? "This asset has no variants yet."
-                  : `The default, and ${variantItems.length - 1} ${
-                      variantItems.length === 2 ? "variant" : "variants"
-                    }.`}
-              </Text>
-              <AssetGrid
-                assets={variantItems}
-                onSelect={(item) => handleTile(item as RasterItem)}
-                defaultAssetId={nav.asset.id}
-                emptyMessage="Nothing to show."
-              />
-            </div>
-            {selected !== null && (
-              <AssetDetail
-                item={selected}
-                canPromote={selected.id !== nav.asset.id && !isProcessing(selected)}
-                onPromote={() => void promote(selected as AssetVariant)}
-                onPick={onPick}
-                pickLabel={pickLabel}
-                onUploadVariant={
-                  assetLibraryId === null ? undefined : () => openFilePicker(nav.asset?.id ?? null)
-                }
-                busy={busy}
-              />
-            )}
-          </div>
+          <VariantView
+            asset={nav.asset}
+            uploadState={uploadState}
+            busy={actions.busy}
+            onPromote={(variant) => void actions.promote(variant)}
+            onPick={onPick}
+            pickLabel={pickLabel}
+            onUploadVariant={
+              actions.canUpload ? () => actions.openFilePicker(nav.asset?.id ?? null) : undefined
+            }
+          />
         ) : (
           <AssetGrid
             assets={assets.assets}
@@ -521,14 +269,16 @@ function Browser({
             onLoadMore={assets.loadMore}
             onSelect={(item) => handleTile(item as RasterItem)}
             emptyMessage={
-              canUpload ? "This library is empty. Drop an image here to upload it." : "Nothing here yet."
+              actions.canUpload
+                ? "This library is empty. Drop an image here to upload it."
+                : "Nothing here yet."
             }
           />
         )}
       </div>
 
       <input
-        ref={fileInputRef}
+        ref={actions.fileInputRef}
         className="rstr-sanity-visually-hidden"
         type="file"
         accept="image/*"
@@ -537,7 +287,7 @@ function Browser({
           const file = event.currentTarget.files?.[0];
           // Cleared so choosing the same file twice in a row still fires a change event.
           event.currentTarget.value = "";
-          if (file !== undefined) void uploadFile(file, uploadParentRef.current);
+          if (file !== undefined) actions.uploadChosenFile(file);
         }}
       />
     </>
