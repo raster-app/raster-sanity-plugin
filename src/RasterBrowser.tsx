@@ -12,7 +12,6 @@ import { Box, Button, Card, Flex, Text } from "@sanity/ui";
 import { icons } from "@sanity/icons";
 import { AssetGrid } from "./asset-grid";
 import { BrowserHeader } from "./browser-header";
-import { pinnedOrganizationId } from "./client";
 import { LibraryList } from "./library-list";
 import { LoadingState } from "./loading-state";
 import { RasterSignInGate } from "./RasterSignInGate";
@@ -43,10 +42,7 @@ export function RasterBrowser({
     // The picker dialog and the tool pane both hand down a fixed height; the grid scrolls inside
     // it rather than growing the page.
     <Flex direction="column" gap={3} style={{ height: "100%", minHeight: 0 }}>
-      <RasterSignInGate
-        config={config}
-        allowStudioKeySetup={allowStudioKeySetup}
-      >
+      <RasterSignInGate allowStudioKeySetup={allowStudioKeySetup}>
         <Browser config={config} onPick={onPick} pickLabel={pickLabel} />
       </RasterSignInGate>
     </Flex>
@@ -68,7 +64,7 @@ function Browser({
 
   /** Data */
   const allOrganizations = useOrganizations();
-  const pinned = pinnedOrganizationId(config);
+  const pinned = config.orgId ?? null;
 
   // A configured organization pins the plugin to it, so there is nothing to switch to.
   const organizations = useMemo(() => {

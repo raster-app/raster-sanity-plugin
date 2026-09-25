@@ -15,16 +15,12 @@ sign in to Raster from inside Studio, and the plugin adds a Raster tool alongsid
 - **`apiKey` is no longer a config option.** It shipped the key in the Studio bundle. Editors
   now sign in with their own Raster account, or an administrator saves the key once in the
   Raster tool. See [An API key for everyone](README.md#an-api-key-for-everyone).
-- **`storageKeyPrefix`, `apiOrigin` and `authOrigin` are removed.** Each Studio workspace now
-  keeps its own Raster session, so workspaces with different keys or organizations no longer
-  share one.
-- **`allowRedirectSignIn` is removed, with the redirect sign-in.** Editors sign in with the
-  device code or an API key, which work in both the tool and the picker.
+- **The `RasterImage` type is removed.** Use `Asset` from `@raster/sdk`.
 
 ### Migrating from 1.x
 
 - Remove `apiKey` from `rasterPlugin(...)`. To keep editors connected without signing in, open
   the Raster tool as an administrator and save the key there.
-- `rasterPlugin({ orgId })` still works. `orgId` is now also available as `organizationId`.
+- `rasterPlugin({ orgId })` still works, and `orgId` is now optional.
 - Documents need no changes. Picked images are still stored as ordinary Sanity image assets, and
   now also carry `source: { name: "raster", id, url }` pointing back to the Raster asset.

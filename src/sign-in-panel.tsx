@@ -1,27 +1,14 @@
-import { useState, type FormEvent } from "react";
 import { useSignIn } from "@raster/react";
-import { Button, Card, Flex, Text, TextInput } from "@sanity/ui";
+import { Button, Card, Flex, Text } from "@sanity/ui";
+import { HOST_NAME } from "./client";
 
-export type SignInPanelProps = {
-  /** Offer the "use an API key instead" path. */
-  allowApiKey: boolean;
-};
-
-/**
- * The ways in: the device code, which works in the tool and the picker alike without leaving
- * the page, and an organization API key. Both paths ends at the SDK's `connect`, which checks the
- * credential with Raster before storing it.
- */
-export function SignInPanel({ allowApiKey }: SignInPanelProps) {
+/** Sign-in with the device code, which works in the tool and the picker without leaving the page. */
+export function SignInPanel() {
   /** Data */
-  const { state, signInWithDevice, connectApiKey, cancel, reset } = useSignIn();
-
-  /** State */
-  const [screen, setScreen] = useState<"idle" | "apiKey">("idle");
+  const { state, signInWithDevice, cancel } = useSignIn();
 
   /** Derived */
   const busy = state.status === "connecting";
-  const error = state.status === "error" ? state.message : null;
 
   /** Early returns */
   if (state.status === "awaitingApproval") {
@@ -44,30 +31,16 @@ export function SignInPanel({ allowApiKey }: SignInPanelProps) {
     );
   }
 
-  if (screen === "apiKey") {
-    return (
-      <ApiKeyForm
-        busy={busy}
-        error={error}
-        onSubmit={connectApiKey}
-        onBack={() => {
-          reset();
-          setScreen("idle");
-        }}
-      />
-    );
-  }
-
   return (
     <Card padding={4} radius={2} border>
       <Flex direction="column" gap={4}>
         <Text size={1}>
-          Connect Sanity Studio to Raster to browse your libraries and place images.
+          Connect {HOST_NAME} to Raster to browse your libraries and place images.
         </Text>
 
-        {error !== null && (
+        {state.status === "error" && (
           <Card tone="critical" padding={3} radius={2} border>
-            <Text size={1}>{error}</Text>
+            <Text size={1}>{state.message}</Text>
           </Card>
         )}
 
@@ -82,90 +55,7 @@ export function SignInPanel({ allowApiKey }: SignInPanelProps) {
             onClick={() => void signInWithDevice()}
           />
         </Flex>
-
-        {allowApiKey && (
-          <Flex>
-            <Button
-              mode="bleed"
-              fontSize={1}
-              padding={2}
-              text="Use an API key instead"
-              disabled={busy}
-              onClick={() => setScreen("apiKey")}
-            />
-          </Flex>
-        )}
       </Flex>
-    </Card>
-  );
-}
-
-function ApiKeyForm({
-  busy,
-  error,
-  onSubmit,
-  onBack,
-}: {
-  busy: boolean;
-  error: string | null;
-  onSubmit: (apiKey: string) => Promise<void>;
-  onBack: () => void;
-}) {
-  /** State */
-  const [value, setValue] = useState("");
-
-  /** Handlers */
-  function handleSubmit(event: FormEvent) {
-    event.preventDefault();
-    const trimmed = value.trim();
-    if (trimmed !== "") void onSubmit(trimmed);
-  }
-
-  return (
-    <Card padding={4} radius={2} border>
-      <form onSubmit={handleSubmit}>
-        <Flex direction="column" gap={4}>
-          <Text size={1} muted>
-            Create a key in Raster under Organization settings → API keys. A key reaches one
-            organization.
-          </Text>
-          <TextInput
-            type="password"
-            fontSize={1}
-            padding={3}
-            value={value}
-            placeholder="Organization API key"
-            aria-label="Organization API key"
-            autoComplete="off"
-            autoFocus
-            onChange={(event) => setValue(event.currentTarget.value)}
-          />
-          {error !== null && (
-            <Card tone="critical" padding={3} radius={2} border>
-              <Text size={1}>{error}</Text>
-            </Card>
-          )}
-          <Flex gap={2} wrap="wrap">
-            <Button
-              type="submit"
-              mode="default"
-              tone="primary"
-              fontSize={1}
-              padding={3}
-              text={busy ? "Checking…" : "Connect"}
-              disabled={busy || value.trim() === ""}
-            />
-            <Button
-              mode="ghost"
-              fontSize={1}
-              padding={3}
-              text="Back"
-              disabled={busy}
-              onClick={onBack}
-            />
-          </Flex>
-        </Flex>
-      </form>
     </Card>
   );
 }

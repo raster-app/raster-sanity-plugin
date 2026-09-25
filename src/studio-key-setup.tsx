@@ -3,11 +3,10 @@ import { toUserMessage } from "@raster/sdk";
 import { Button, Card, Flex, Text, TextInput } from "@sanity/ui";
 import { useCurrentUser } from "sanity";
 import { verifyApiKey } from "./client";
-import { type RasterConfig } from "./types";
 import { useStudioKey } from "./use-studio-key";
 
 /** Lets an administrator save or remove the API key used for everyone in this studio. */
-export function StudioKeySetup({ config }: { config: RasterConfig }) {
+export function StudioKeySetup() {
   /** Context */
   const studioKey = useStudioKey();
   const user = useCurrentUser();
@@ -26,7 +25,7 @@ export function StudioKeySetup({ config }: { config: RasterConfig }) {
     setStatus("saving");
     setError(null);
     try {
-      await verifyApiKey(config, apiKey);
+      await verifyApiKey(apiKey);
       await studioKey.save(apiKey);
     } catch (caught) {
       console.error(caught);

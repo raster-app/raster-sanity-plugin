@@ -5,16 +5,13 @@ import { Card, Flex, Text } from "@sanity/ui";
 import { LoadingState } from "./loading-state";
 import { SignInPanel } from "./sign-in-panel";
 import { StudioKeySetup } from "./studio-key-setup";
-import { type RasterConfig } from "./types";
 import { useStudioKey } from "./use-studio-key";
 
 /** Renders its children once there is a credential; a key saved for the studio is used first. */
 export function RasterSignInGate({
-  config,
   allowStudioKeySetup = false,
   children,
 }: {
-  config: RasterConfig;
   /** Let an admin save an API key for the studio. The tool only. */
   allowStudioKeySetup?: boolean;
   children: ReactNode;
@@ -65,9 +62,9 @@ export function RasterSignInGate({
         </Card>
       )}
 
-      <SignInPanel allowApiKey={config.hideApiKeySignIn !== true} />
+      <SignInPanel />
 
-      {allowStudioKeySetup && <StudioKeySetup config={config} />}
+      {allowStudioKeySetup && <StudioKeySetup />}
     </Flex>
   );
 }

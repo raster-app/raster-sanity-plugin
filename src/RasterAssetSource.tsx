@@ -63,7 +63,7 @@ export function RasterAssetSource(props: RasterAssetSourceProps) {
       style={{ height: "96vh", marginTop: "40px" }}
     >
       <Box padding={4} style={{ height: "100%", minHeight: 0 }}>
-        <RasterStudioProvider config={config}>
+        <RasterStudioProvider>
           <Suspense fallback={<RasterBrowserFallback />}>
             <RasterBrowser
               config={config}

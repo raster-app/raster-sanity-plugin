@@ -5,33 +5,33 @@ import {
   memoryCredentialStore,
   type RasterClient,
 } from "@raster/sdk";
-import { type RasterConfig } from "./types";
 
 // Per workspace, since workspaces can pin different organizations:
 // https://github.com/raster-app/raster-sdk#the-client-is-an-instance-not-a-singleton
 const clients = new Map<string, RasterClient>();
 
-/** The organization the config pins the plugin to, if any. */
-export function pinnedOrganizationId(config: RasterConfig): string | null {
-  return config.organizationId ?? config.orgId ?? null;
-}
+/** What Raster's consent page, Connected apps and the sign-in screen call this host. */
+export const HOST_NAME = "Sanity Studio";
+
+const HOST = {
+  name: HOST_NAME,
+  openExternal: (url: string) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+  },
+};
 
 /**
  * With a studio key, the credential is kept in memory and connected on every load, so a
  * rotated key takes effect on the next one instead of a stored copy outliving it.
  */
-export function getRasterClient(
-  config: RasterConfig,
-  workspace: string,
-  hasStudioKey: boolean
-): RasterClient {
+export function getRasterClient(workspace: string, hasStudioKey: boolean): RasterClient {
   const cacheKey = `${workspace}|${hasStudioKey ? "studio-key" : "session"}`;
   const existing = clients.get(cacheKey);
   if (existing !== undefined) return existing;
 
   const prefix = `raster.${workspace}`;
   const client = createRasterClient({
-    host: hostFor(config),
+    host: HOST,
     credentials: hasStudioKey
       ? memoryCredentialStore()
       : localStorageCredentialStore(`${prefix}.credentials`),
@@ -43,16 +43,7 @@ export function getRasterClient(
 }
 
 /** Checks a key with Raster without storing it anywhere. */
-export async function verifyApiKey(config: RasterConfig, apiKey: string): Promise<void> {
-  const client = createRasterClient({ host: hostFor(config), credentials: memoryCredentialStore() });
+export async function verifyApiKey(apiKey: string): Promise<void> {
+  const client = createRasterClient({ host: HOST, credentials: memoryCredentialStore() });
   await client.auth.connect({ apiKey });
-}
-
-function hostFor(config: RasterConfig) {
-  return {
-    name: config.hostName ?? "Sanity",
-    openExternal: (url: string) => {
-      window.open(url, "_blank", "noopener,noreferrer");
-    },
-  };
 }

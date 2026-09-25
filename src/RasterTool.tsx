@@ -21,7 +21,7 @@ const RasterBrowser = React.lazy(() =>
 export function RasterTool({ config }: RasterToolProps) {
   return (
     <Box padding={4} style={{ height: "100%", minHeight: 0 }}>
-      <RasterStudioProvider config={config}>
+      <RasterStudioProvider>
         <Suspense fallback={<RasterBrowserFallback />}>
           <RasterBrowser config={config} allowStudioKeySetup />
         </Suspense>
