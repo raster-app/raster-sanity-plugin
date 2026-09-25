@@ -166,7 +166,7 @@ packages: `@raster/sdk` (the REST client, OAuth and image helpers) and `@raster/
 ```bash
 pnpm install
 pnpm typecheck
-pnpm lint
+pnpm check   # Biome: format and lint, applying safe fixes
 pnpm build
 ```
 

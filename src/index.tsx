@@ -4,7 +4,6 @@ import { RasterAssetSource } from "./raster-asset-source";
 import { RasterTool } from "./raster-tool";
 import { type RasterConfig } from "./types";
 
-// eslint-disable-next-line react-refresh/only-export-components
 export * from "./types";
 
 /** Adds Raster as an asset source on every image field, and a Raster tool. */
