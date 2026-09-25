@@ -14,7 +14,7 @@ import { BrowserHeader } from "./browser-header";
 import { pinnedOrganizationId } from "./client";
 import { LeaveIcon } from "./icons";
 import { RasterSignInGate } from "./RasterSignInGate";
-import { type RasterConfig, type RasterItem } from "./types";
+import { isImage, type RasterConfig, type RasterItem } from "./types";
 import { useBrowserActions } from "./use-browser-actions";
 import { VariantView } from "./variant-view";
 
@@ -126,6 +126,10 @@ function Browser({
   }
 
   function handleTile(item: RasterItem) {
+    // The tool browses everything; the picker fills an image field, so a video or PDF is a
+    // tile it ignores rather than one that fails in Sanity after the dialog has closed.
+    if (onPick !== undefined && !isImage(item as Asset)) return;
+
     // In the picker, an asset with no variants is one click: there is nothing to choose
     // between, and making an editor open it first would be ceremony.
     const hasVariants = "variants" in item && (item.variants?.length ?? 0) > 0;

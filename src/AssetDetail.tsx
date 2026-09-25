@@ -14,6 +14,8 @@ export type AssetDetailProps = {
   /** Present in the asset-source dialog; absent in the tool, which selects nothing. */
   onPick?: (item: RasterItem) => void;
   pickLabel: string;
+  /** False for a video or PDF, which an image field cannot take. */
+  canPick: boolean;
   /** Offer an upload attached to this asset as a new variant. */
   onUploadVariant?: () => void;
   busy: string | null;
@@ -31,6 +33,7 @@ export function AssetDetail({
   onPromote,
   onPick,
   pickLabel,
+  canPick,
   onUploadVariant,
   busy,
 }: AssetDetailProps) {
@@ -105,6 +108,12 @@ export function AssetDetail({
           </Text>
         )}
 
+        {onPick !== undefined && !canPick && (
+          <Text size={1} muted>
+            Only images can be used in this field.
+          </Text>
+        )}
+
         <div className="rstr-sanity-stack rstr-sanity-gap-2">
           {onPick !== undefined && (
             <Button
@@ -114,7 +123,7 @@ export function AssetDetail({
               padding={3}
               // Until a promote finishes, the asset's URL may still serve the previous default,
               // and that is what Sanity would fetch and store.
-              disabled={!ready || busy === "promote"}
+              disabled={!ready || !canPick || busy === "promote"}
               onClick={() => onPick(item)}
               text={pickLabel}
             />

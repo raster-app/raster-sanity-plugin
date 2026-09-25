@@ -3,7 +3,7 @@ import { type Asset, type AssetVariant, type UploadState } from "@raster/react";
 import { AssetGrid } from "@raster/ui";
 import { Text } from "@sanity/ui";
 import { AssetDetail } from "./AssetDetail";
-import { type RasterItem } from "./types";
+import { isImage, type RasterItem } from "./types";
 
 /**
  * Whether this is the optimistic placeholder for a variant Raster has not finished making.
@@ -88,6 +88,7 @@ export function VariantView({
         onPromote={() => onPromote(selected as AssetVariant)}
         onPick={onPick}
         pickLabel={pickLabel}
+        canPick={isImage(asset)}
         onUploadVariant={onUploadVariant}
         busy={busy}
       />

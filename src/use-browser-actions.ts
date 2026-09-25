@@ -55,6 +55,12 @@ export function useBrowserActions({
     const libraryId = assetLibraryId;
     if (organizationId === null || libraryId === null) return;
 
+    // A drop can be any file, and the file dialog's `accept` is only a hint.
+    if (!file.type.startsWith("image/")) {
+      setError(`${file.name} is not an image. Only images can be uploaded here.`);
+      return;
+    }
+
     const run = ++uploadRunRef.current;
     setError(null);
     setNotice(null);

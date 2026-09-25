@@ -22,8 +22,7 @@ const RasterBrowser = React.lazy(() =>
  *
  * What lands in the document is a URL for Sanity to fetch and store, plus provenance: the
  * Raster asset's id and its link in the app, under the asset document's `source`. That is
- * what lets an editor get from an image in a document back to the asset it came from — and
- * what lets Sanity recognise the same Raster asset if it is chosen again.
+ * what lets an editor get from an image in a document back to the asset it came from.
  */
 export function RasterAssetSource(props: RasterAssetSourceProps) {
   const { config, onSelect, onClose, dialogHeaderTitle } = props;
@@ -42,7 +41,9 @@ export function RasterAssetSource(props: RasterAssetSourceProps) {
           originalFilename: item.name ?? undefined,
           source: {
             name: "raster",
-            id: item.id,
+            // Always the asset, even for a variant, so a document can tell which asset it
+            // holds; `url` still opens the exact variant that was picked.
+            id: item.parentId ?? item.id,
             url: item.appUrl ?? undefined,
           },
           ...("description" in item && item.description != null && item.description !== ""

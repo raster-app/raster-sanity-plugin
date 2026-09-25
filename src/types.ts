@@ -63,6 +63,14 @@ export interface RasterConfig {
  */
 export type RasterItem = Asset | AssetVariant;
 
+/**
+ * Whether an image field can take this asset. Libraries also hold video and PDF, which
+ * Sanity would fail to store as an image. Variants carry no type, so ask of the asset.
+ */
+export function isImage(asset: Asset): boolean {
+  return asset.contentType?.startsWith("image/") === true;
+}
+
 export interface RasterAssetSourceProps extends AssetSourceComponentProps {
   config: RasterConfig;
 }
