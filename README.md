@@ -39,6 +39,8 @@ pnpm add @raster-app/sanity-plugin-raster
 | `@sanity/ui` | 3.x, 4.x |
 | `react` | 19 |
 
+Upgrading from 1.x, which supported Sanity v3? See the [migration notes](CHANGELOG.md#migrating-from-1x).
+
 `@sanity/ui` is a **peer dependency**, not a dependency — it carries the Studio's theme through
 React context, and a second copy means a component that cannot read it. Every studio already has
 it by way of `sanity`, so there is nothing to install.
