@@ -18,6 +18,8 @@ sign in to Raster from inside Studio, and the plugin adds a Raster tool alongsid
 - **`storageKeyPrefix`, `apiOrigin` and `authOrigin` are removed.** Each Studio workspace now
   keeps its own Raster session, so workspaces with different keys or organizations no longer
   share one.
+- **`allowRedirectSignIn` is removed, with the redirect sign-in.** Editors sign in with the
+  device code or an API key, which work in both the tool and the picker.
 
 ### Migrating from 1.x
 

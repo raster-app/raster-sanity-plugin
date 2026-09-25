@@ -15,22 +15,15 @@ const RasterBrowser = React.lazy(() =>
 );
 
 /**
- * Raster as a Studio tool: the same browser, with the whole pane to work in.
- *
- * The tool is also where the redirect sign-in is offered. It owns its own route, so coming
- * back from Raster lands on this URL with nothing else on screen to lose — which is exactly
- * what the asset-source dialog cannot say.
+ * Raster as a Studio tool: the same browser, with the whole pane to work in, and where an
+ * admin saves the studio's API key.
  */
 export function RasterTool({ config }: RasterToolProps) {
   return (
     <Box padding={4} style={{ height: "100%", minHeight: 0 }}>
       <RasterStudioProvider config={config}>
         <Suspense fallback={<RasterBrowserFallback />}>
-          <RasterBrowser
-            config={config}
-            allowRedirectSignIn={config.allowRedirectSignIn !== false}
-            allowStudioKeySetup
-          />
+          <RasterBrowser config={config} allowStudioKeySetup />
         </Suspense>
       </RasterStudioProvider>
     </Box>

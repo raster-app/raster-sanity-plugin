@@ -77,9 +77,6 @@ export function RasterAssetSource(props: RasterAssetSourceProps) {
               config={config}
               onPick={handlePick}
               pickLabel="Use this image"
-              // No redirect sign-in here: leaving the page would unmount the document being
-              // edited, unsaved changes and all. The device code works without navigating.
-              allowRedirectSignIn={false}
             />
           </Suspense>
         </RasterStudioProvider>

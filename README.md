@@ -13,9 +13,8 @@ OAuth flows and image renditions that power Raster's Figma plugin — with every
 - **Asset source on every image field** — pick an image from Raster without leaving the
   document, and the Raster asset's id and app link are recorded on the Sanity asset.
 - **A Raster tool** for browsing libraries on their own, with the whole pane to work in.
-- **Sign in from inside Studio** — the device code flow, a redirect sign-in, or an
-  organization API key, which an admin can also save once for everyone. No credentials in
-  your Studio config.
+- **Sign in from inside Studio** — the device code flow or an organization API key, which an
+  admin can also save once for everyone. No credentials in your Studio config.
 - **Organization switcher** for a credential that reaches more than one.
 - **Full-text search** across an organization, or narrowed to the open library.
 - **Variants** — browse an asset's crops and adjustments, and promote one to be the default.
@@ -89,10 +88,6 @@ rasterPlugin({
 
   // What Raster's consent page shows and Connected apps lists. Defaults to "Sanity".
   hostName: "Sanity",
-
-  // Offer the redirect sign-in in the Raster tool alongside the device code. Default true.
-  // The picker never offers it: a redirect would unmount the document being edited.
-  allowRedirectSignIn: true,
 
   // Hide the "use an API key instead" path from the sign-in screen. Default false.
   hideApiKeySignIn: false,
@@ -204,7 +199,7 @@ pnpm install
 | `src/client.ts`           | One `RasterClient` per Studio workspace, with Studio's host adapters.     |
 | `src/RasterStudioProvider.tsx` | The workspace's client, for the `@raster/react` hooks.             |
 | `src/RasterSignInGate.tsx` | The three ways in, and the API key saved for the studio.                 |
-| `src/sign-in-panel.tsx`   | The sign-in screens: device code, redirect and API key.                  |
+| `src/sign-in-panel.tsx`   | The sign-in screens: device code and API key.                            |
 | `src/use-studio-key.ts`   | Reads and writes that key in the `secrets.raster` document.              |
 | `src/studio-key-setup.tsx` | Where an administrator saves or removes it, in the tool.                |
 | `src/RasterBrowser.tsx`   | The organization → library → asset browser, shared by tool and picker.   |

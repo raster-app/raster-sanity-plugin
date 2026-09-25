@@ -23,13 +23,6 @@ export interface RasterConfig {
    */
   hostName?: string;
 
-  /**
-   * Offer the redirect sign-in (authorization code + PKCE) in the Raster tool, alongside the
-   * device grant. Defaults to true. The asset-source dialog never offers it: a redirect
-   * would unmount the document being edited.
-   */
-  allowRedirectSignIn?: boolean;
-
   /** Hide the "use an API key instead" path from the sign-in screen. Defaults to false. */
   hideApiKeySignIn?: boolean;
 }

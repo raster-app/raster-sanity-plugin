@@ -29,8 +29,6 @@ export type RasterBrowserProps = {
    */
   onPick?: (item: RasterItem) => void;
   pickLabel?: string;
-  /** Offer the redirect sign-in. False in the dialog, where a redirect loses the document. */
-  allowRedirectSignIn?: boolean;
   /** Let an admin save an API key for the studio. True in the tool only. */
   allowStudioKeySetup?: boolean;
 };
@@ -39,7 +37,6 @@ export function RasterBrowser({
   config,
   onPick,
   pickLabel = "Use this image",
-  allowRedirectSignIn = false,
   allowStudioKeySetup = false,
 }: RasterBrowserProps) {
   return (
@@ -48,7 +45,6 @@ export function RasterBrowser({
     <Flex direction="column" gap={3} style={{ height: "100%", minHeight: 0 }}>
       <RasterSignInGate
         config={config}
-        allowRedirectSignIn={allowRedirectSignIn}
         allowStudioKeySetup={allowStudioKeySetup}
       >
         <Browser config={config} onPick={onPick} pickLabel={pickLabel} />

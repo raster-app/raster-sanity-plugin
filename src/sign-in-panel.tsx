@@ -1,26 +1,20 @@
 import { useState, type FormEvent } from "react";
 import { useSignIn } from "@raster/react";
-import { type PkcePending } from "@raster/sdk";
 import { Button, Card, Flex, Text, TextInput } from "@sanity/ui";
 
 export type SignInPanelProps = {
-  /** Offer the redirect sign-in, handing back what must survive the navigation. */
-  pkce?: {
-    redirectUri: string;
-    onReady: (authorizationUrl: string, pending: PkcePending) => void;
-  };
   /** Offer the "use an API key instead" path. */
   allowApiKey: boolean;
 };
 
 /**
- * The ways in: the device grant by default, the redirect when the host can come back to this
- * page, and an organization API key. Every path ends at the SDK's `connect`, which checks the
+ * The ways in: the device code, which works in the tool and the picker alike without leaving
+ * the page, and an organization API key. Both paths ends at the SDK's `connect`, which checks the
  * credential with Raster before storing it.
  */
-export function SignInPanel({ pkce, allowApiKey }: SignInPanelProps) {
+export function SignInPanel({ allowApiKey }: SignInPanelProps) {
   /** Data */
-  const { state, signInWithDevice, beginPkceSignIn, connectApiKey, cancel, reset } = useSignIn();
+  const { state, signInWithDevice, connectApiKey, cancel, reset } = useSignIn();
 
   /** State */
   const [screen, setScreen] = useState<"idle" | "apiKey">("idle");
@@ -28,14 +22,6 @@ export function SignInPanel({ pkce, allowApiKey }: SignInPanelProps) {
   /** Derived */
   const busy = state.status === "connecting";
   const error = state.status === "error" ? state.message : null;
-
-  /** Handlers */
-  async function handleRedirect() {
-    if (pkce === undefined) return;
-    const started = await beginPkceSignIn({ redirectUri: pkce.redirectUri });
-    // The host owns the navigation: only it knows where `pending` can survive the redirect.
-    if (started !== null) pkce.onReady(started.authorizationUrl, started.pending);
-  }
 
   /** Early returns */
   if (state.status === "awaitingApproval") {
@@ -85,7 +71,7 @@ export function SignInPanel({ pkce, allowApiKey }: SignInPanelProps) {
           </Card>
         )}
 
-        <Flex gap={2} wrap="wrap">
+        <Flex>
           <Button
             mode="default"
             tone="primary"
@@ -95,16 +81,6 @@ export function SignInPanel({ pkce, allowApiKey }: SignInPanelProps) {
             disabled={busy}
             onClick={() => void signInWithDevice()}
           />
-          {pkce !== undefined && (
-            <Button
-              mode="ghost"
-              fontSize={1}
-              padding={3}
-              text="Sign in in this window"
-              disabled={busy}
-              onClick={() => void handleRedirect()}
-            />
-          )}
         </Flex>
 
         {allowApiKey && (

@@ -15,11 +15,6 @@ import { type RasterConfig } from "./types";
  */
 const clients = new Map<string, RasterClient>();
 
-/** The `localStorage` namespace a workspace's session lives in. */
-export function storagePrefix(workspace: string): string {
-  return `raster.${workspace}`;
-}
-
 /** The organization the config pins the plugin to, if any. */
 export function pinnedOrganizationId(config: RasterConfig): string | null {
   return config.organizationId ?? config.orgId ?? null;
@@ -29,7 +24,7 @@ export function getRasterClient(config: RasterConfig, workspace: string): Raster
   const existing = clients.get(workspace);
   if (existing !== undefined) return existing;
 
-  const prefix = storagePrefix(workspace);
+  const prefix = `raster.${workspace}`;
   const client = createRasterClient({
     host: {
       name: config.hostName ?? "Sanity",
