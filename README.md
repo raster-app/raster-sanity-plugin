@@ -187,18 +187,18 @@ pnpm install
 | ------------------------- | ------------------------------------------------------------------------ |
 | `src/index.tsx`           | The plugin: the asset source and the tool.                               |
 | `src/client.ts`           | One `RasterClient` per Studio workspace, with Studio's host adapters.     |
-| `src/RasterStudioProvider.tsx` | The workspace's client, for the `@raster/react` hooks.             |
-| `src/RasterSignInGate.tsx` | The three ways in, and the API key saved for the studio.                 |
+| `src/raster-studio-provider.tsx` | The workspace's client, for the `@raster/react` hooks.             |
+| `src/raster-sign-in-gate.tsx` | Connects with the studio key, or shows the sign-in screen.            |
 | `src/sign-in-panel.tsx`   | The device code sign-in.                                                 |
 | `src/use-studio-key.ts`   | Reads and writes that key in the `secrets.raster` document.              |
 | `src/studio-key-setup.tsx` | Where an administrator saves or removes it, in the tool.                |
-| `src/RasterBrowser.tsx`   | The organization → library → asset browser, shared by tool and picker.   |
+| `src/raster-browser.tsx`   | The organization → library → asset browser, shared by tool and picker.   |
 | `src/browser-header.tsx`  | The switcher, breadcrumb, actions and search box.                        |
 | `src/library-list.tsx`    | An organization's libraries.                                             |
 | `src/asset-grid.tsx`      | The asset grid, with infinite paging and blurhash placeholders.          |
 | `src/variant-view.tsx`    | One asset's default and variants, with the detail pane.                  |
 | `src/use-browser-actions.ts` | Upload and promote, and the busy, error and notice they report.       |
-| `src/AssetDetail.tsx`     | The selected asset's facts and actions.                                  |
+| `src/asset-detail.tsx`     | The selected asset's facts and actions.                                  |
 | `src/loading-state.tsx`   | A spinner with a label.                                                  |
 
 There is no stylesheet: layout is `Flex`, `Grid` and `Box`, and colour comes from `Card` tones,

@@ -2,14 +2,14 @@ import React, { Suspense, useCallback } from "react";
 import { getFullSizeUrl } from "@raster/sdk";
 import { Box, Dialog } from "@sanity/ui";
 import { type AssetFromSource } from "sanity";
-import { RasterBrowserFallback } from "./RasterFallback";
-import { RasterStudioProvider } from "./RasterStudioProvider";
+import { RasterBrowserFallback } from "./raster-fallback";
+import { RasterStudioProvider } from "./raster-studio-provider";
 import { type RasterAssetSourceProps, type RasterItem } from "./types";
 
 // Lazy because Studio extracts schemas in Node, and the browser reaches the DOM. The `catch`
 // keeps a failed chunk from breaking the form.
 const RasterBrowser = React.lazy(() =>
-  import("./RasterBrowser")
+  import("./raster-browser")
     .then((module) => ({ default: module.RasterBrowser }))
     .catch((caught: unknown) => {
       console.error(caught);

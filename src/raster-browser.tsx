@@ -14,7 +14,7 @@ import { AssetGrid } from "./asset-grid";
 import { BrowserHeader } from "./browser-header";
 import { LibraryList } from "./library-list";
 import { LoadingState } from "./loading-state";
-import { RasterSignInGate } from "./RasterSignInGate";
+import { RasterSignInGate } from "./raster-sign-in-gate";
 import { isImage, type RasterConfig, type RasterItem } from "./types";
 import { useBrowserActions } from "./use-browser-actions";
 import { VariantView } from "./variant-view";

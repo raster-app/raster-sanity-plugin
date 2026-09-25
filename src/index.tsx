@@ -1,7 +1,7 @@
 import { definePlugin, type AssetSource, type Tool } from "sanity";
 import { icons } from "@sanity/icons";
-import { RasterAssetSource } from "./RasterAssetSource";
-import { RasterTool } from "./RasterTool";
+import { RasterAssetSource } from "./raster-asset-source";
+import { RasterTool } from "./raster-tool";
 import { type RasterConfig } from "./types";
 
 // eslint-disable-next-line react-refresh/only-export-components

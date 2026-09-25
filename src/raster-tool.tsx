@@ -1,12 +1,12 @@
 import React, { Suspense } from "react";
 import { Box } from "@sanity/ui";
-import { RasterBrowserFallback } from "./RasterFallback";
-import { RasterStudioProvider } from "./RasterStudioProvider";
+import { RasterBrowserFallback } from "./raster-fallback";
+import { RasterStudioProvider } from "./raster-studio-provider";
 import { type RasterToolProps } from "./types";
 
 // Lazy for the same reason as in `RasterAssetSource`.
 const RasterBrowser = React.lazy(() =>
-  import("./RasterBrowser")
+  import("./raster-browser")
     .then((module) => ({ default: module.RasterBrowser }))
     .catch((caught: unknown) => {
       console.error(caught);

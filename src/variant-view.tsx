@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { type Asset, type AssetVariant, type UploadState } from "@raster/react";
 import { Box, Flex, Text } from "@sanity/ui";
-import { AssetDetail } from "./AssetDetail";
+import { AssetDetail } from "./asset-detail";
 import { AssetGrid } from "./asset-grid";
 import { isImage, type RasterItem } from "./types";
 
