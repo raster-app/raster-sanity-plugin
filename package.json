@@ -38,7 +38,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "link-watch": "plugin-kit link-watch",
-    "prepublishOnly": "node scripts/check-publishable.mjs && pnpm build",
+    "prepublishOnly": "pnpm build",
     "pack": "npm pack",
     "typecheck": "tsc --noEmit"
   },

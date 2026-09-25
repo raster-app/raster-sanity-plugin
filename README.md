@@ -163,8 +163,7 @@ and hooks) and `@raster/ui` (the shared grid, switcher and sign-in, themed per h
 > **While the SDK is unpublished**, the three `@raster/*` dependencies point at a sibling
 > checkout with `link:../raster-plugin-sdk/...`, so `pnpm install` expects
 > `raster-plugin-sdk` next to this repository with its packages built (`pnpm build` there).
-> Replace them with the published ranges before releasing — `pnpm prepublishOnly` refuses to
-> publish while a `link:` dependency is in place.
+> Replace them with the published ranges before releasing.
 
 ```bash
 pnpm install
