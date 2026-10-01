@@ -1,3 +1,6 @@
+packages:
+  - examples/*
+
 # Our own scope, so a release installs the day it publishes. The cooldown still guards the rest.
 minimumReleaseAgeExclude:
   - '@raster-app/*'

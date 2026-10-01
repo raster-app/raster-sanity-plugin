@@ -169,7 +169,10 @@ pnpm check   # Biome: format and lint, applying safe fixes
 pnpm build
 ```
 
-To try it in a real Studio:
+[`examples/studio`](examples/studio) is a Studio that loads the plugin from `src/`, for trying it
+by hand. Its README holds the setup and the manual QA checklist.
+
+To try the built plugin in another Studio:
 
 ```bash
 # In the plugin directory

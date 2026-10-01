@@ -57,6 +57,7 @@
 			"!**/node_modules",
 			"!**/dist",
 			"!**/.turbo",
+			"!**/.sanity",
 			"!.claude",
 			"!**/__generated__"
 		],
