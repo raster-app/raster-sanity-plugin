@@ -2,8 +2,9 @@
 
 ## 2.0.0
 
-A rewrite on the [Raster Plugin SDK](https://github.com/raster-app/raster-sdk). Editors can now
-sign in to Raster from inside Studio, and the plugin adds a Raster tool alongside the asset source.
+A rewrite on Raster's drop-in picker, [`@raster-app/react`](https://www.npmjs.com/package/@raster-app/react).
+Editors can now sign in to Raster from inside Studio, and the plugin adds a Raster tool alongside
+the asset source.
 
 ### Breaking changes
 
@@ -15,7 +16,7 @@ sign in to Raster from inside Studio, and the plugin adds a Raster tool alongsid
 - **`apiKey` is no longer a config option.** It shipped the key in the Studio bundle. Editors
   now sign in with their own Raster account, or an administrator saves the key once in the
   Raster tool. See [An API key for everyone](README.md#an-api-key-for-everyone).
-- **The `RasterImage` type is removed.** Use `Asset` from `@raster/sdk`.
+- **The `RasterImage` type is removed.** Use `Asset` from `@raster-app/react`.
 
 ### Migrating from 1.x
 

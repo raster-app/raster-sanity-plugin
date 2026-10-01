@@ -4,42 +4,46 @@ import {
 	localStorageStateStore,
 	memoryCredentialStore,
 	type RasterClient,
-} from '@raster/sdk'
-
-// Per workspace, since workspaces can pin different organizations:
-// https://github.com/raster-app/raster-sdk#the-client-is-an-instance-not-a-singleton
-const clients = new Map<string, RasterClient>()
-
-/** What Raster's consent page, Connected apps and the sign-in screen call this host. */
-export const HOST_NAME = 'Sanity Studio'
+	type StateStore,
+} from '@raster-app/react'
 
 const HOST = {
-	name: HOST_NAME,
+	/** What Raster's consent page, Connected apps and the sign-in screen call this host. */
+	name: 'Sanity Studio',
 	openExternal: (url: string) => {
 		window.open(url, '_blank', 'noopener,noreferrer')
 	},
 }
 
+// One per workspace and pinned organization, each with its own sign-in, so one made without
+// the pin is never reused under it.
+const clients = new Map<string, { client: RasterClient; state: StateStore }>()
+
 /**
  * With a studio key, the credential is kept in memory and connected on every load, so a
  * rotated key takes effect on the next one instead of a stored copy outliving it.
  */
-export function getRasterClient(workspace: string, hasStudioKey: boolean): RasterClient {
-	const cacheKey = `${workspace}|${hasStudioKey ? 'studio-key' : 'session'}`
+export function getRasterClient(
+	workspace: string,
+	orgId: string | undefined,
+	hasStudioKey: boolean
+): { client: RasterClient; state: StateStore } {
+	const prefix = orgId === undefined ? `raster.${workspace}` : `raster.${workspace}.org.${orgId}`
+	const cacheKey = `${prefix}|${hasStudioKey ? 'studio-key' : 'session'}`
 	const existing = clients.get(cacheKey)
 	if (existing !== undefined) return existing
 
-	const prefix = `raster.${workspace}`
-	const client = createRasterClient({
-		host: HOST,
-		credentials: hasStudioKey
-			? memoryCredentialStore()
-			: localStorageCredentialStore(`${prefix}.credentials`),
+	const created = {
+		client: createRasterClient({
+			host: HOST,
+			credentials: hasStudioKey
+				? memoryCredentialStore()
+				: localStorageCredentialStore(`${prefix}.credentials`),
+		}),
 		state: localStorageStateStore(`${prefix}.state.`),
-	})
-
-	clients.set(cacheKey, client)
-	return client
+	}
+	clients.set(cacheKey, created)
+	return created
 }
 
 /** Checks a key with Raster without storing it anywhere. */

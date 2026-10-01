@@ -4,25 +4,23 @@ A Sanity Studio plugin for [Raster](https://raster.app), a digital asset managem
 Browse your Raster organizations, libraries and variants from inside Studio, and pick images
 straight into any image field.
 
-Built on the [Raster Plugin SDK](https://github.com/raster-app/raster-sdk) — the same client,
-OAuth flows and image renditions that power Raster's Figma plugin — with every screen drawn in
-`@sanity/ui`, so it looks and behaves like the rest of Studio.
+Built on [`@raster-app/react`](https://www.npmjs.com/package/@raster-app/react), Raster's
+drop-in asset picker: the same sign-in, browsing and uploads as Raster's other plugins, drawn as
+Raster draws them.
 
 ## Features
 
 - **Asset source on every image field** — pick an image from Raster without leaving the
   document, and the Raster asset's id and app link are recorded on the Sanity asset.
 - **A Raster tool** for browsing libraries on their own, with the whole pane to work in.
+  Picking an asset there copies its URL.
 - **Sign in from inside Studio** with the device code flow, or connect everyone with an
   organization API key an admin saves once. No credentials in your Studio config.
 - **Organization switcher** for a credential that reaches more than one.
 - **Full-text search** across an organization, or narrowed to the open library.
-- **Variants** — browse an asset's crops and adjustments, and promote one to be the default.
+- **Versions** — browse an asset's variants, and set one as the default.
 - **Upload** by button or drag-and-drop, as a new asset or as a variant of an existing one.
-- **Infinite paging, blurhash placeholders and reserved aspect ratios**, so the grid does not
-  reflow as images land.
-- **Native Studio UI**, built from `@sanity/ui`, so it follows the Studio's theme and colour
-  scheme.
+- **Follows the Studio's light or dark scheme.**
 
 ## Installation
 
@@ -46,16 +44,14 @@ Upgrading from 1.x, which supported Sanity v3? See the [migration notes](CHANGEL
 React context, and a second copy means a component that cannot read it. Every studio already has
 it by way of `sanity`, so there is nothing to install.
 
-The plugin only uses components exported from the package root in both 3.x and 4.x: `Badge`,
-`Box`, `Button`, `Card`, `Dialog`, `Flex`, `Grid`, `Select`, `Spinner`, `Text` and
-`TextInput`, laid out with `Flex` and `Grid`'s `gap`, which both versions accept. Some things
-are avoided on purpose:
+The plugin only uses what the package root exports in both 3.x and 4.x: `Box`, `Button`,
+`Card`, `Dialog`, `Flex`, `Spinner`, `Text` and `TextInput`, laid out with `Flex`'s `gap`, which
+both versions accept. Some things are avoided on purpose:
 
 - **`Stack` and `Inline`**, whose spacing prop was renamed `space` → `gap` between 3.0 and 4.0
   with no spelling valid in both. `<Flex direction="column" gap={3}>` does the same job.
-- **`MenuButton`, `Menu`, `Breadcrumbs`, `Tooltip`, `Popover` and `Code`**, which 4.x moved
-  to subpaths that 3.x does not have. The organization switcher is a `Select`, and the
-  breadcrumb is `Flex` with `Button` and `Text`.
+- **`MenuButton`, `Menu`, `Breadcrumbs`, `Tooltip`, `Popover`, `Code` and `useToast`**, which
+  4.x moved to subpaths that 3.x does not have.
 
 ## Setup
 
@@ -79,10 +75,14 @@ The only option is optional:
 
 ```typescript
 rasterPlugin({
-  // Pin the plugin to one organization. The switcher is then hidden.
+  // Pin the plugin to one organization: a sign-in that grants any other fails.
   orgId: "acme",
 });
 ```
+
+A pinned plugin keeps its sign-ins apart from an unpinned one, so pinning it, or changing the
+pin, asks editors to sign in again. Editors can't connect an API key of their own while it is
+pinned.
 
 ### An API key for everyone
 
@@ -100,14 +100,16 @@ ship in the Studio bundle. It is not hidden from your team, though:
   available on Enterprise plans, can limit that.
 - **Dataset exports include it.**
 
-So create the key for this Studio alone, with access to only the libraries it needs.
+So create the key for this Studio alone, with access to only the libraries it needs. With
+`orgId` set, create it in that organization: the plugin uses whichever organization a saved key
+belongs to.
 
 ### Where the session is stored
 
-The credential is kept in `localStorage`, per browser and per Studio workspace, so editors
-sign in once rather than on every reload. It also means **any script or plugin running on the
-Studio's origin can read the token** — the usual trade for an admin UI, but worth making
-deliberately. Signing out clears it and asks Raster to revoke the session, and an editor can
+The credential is kept in `localStorage`, per browser, Studio workspace and pinned
+organization, so editors sign in once rather than on every reload. It also means **any script
+or plugin running on the Studio's origin can read the token** — the usual trade for an admin UI,
+but worth making deliberately. Signing out clears it and asks Raster to revoke the session, and an editor can
 also revoke it in Raster under **Settings > Connected apps**.
 
 ## Usage
@@ -146,22 +148,19 @@ the image pipeline, GROQ projections, `next-sanity-image` — works unchanged:
 Raster>" }`. That is what gets an editor from an image in a document back to the asset it came
 from.
 
-### Promoting a variant
+The picker lists every asset in a library, videos and PDFs included. Picking one of those into
+an image field says that only images can be used, and leaves the picker open.
 
-Sanity keeps the file it copied when the image was picked. Promoting a variant in Raster
-doesn't change documents; to update one, pick the image again.
+### Setting a default version
+
+Sanity keeps the file it copied when the image was picked. Setting another version as the
+default in Raster doesn't change documents; to update one, pick the image again.
 
 ## Development
 
-The plugin is built against the [Raster Plugin SDK](https://github.com/raster-app/raster-sdk)
-packages: `@raster/sdk` (the REST client, OAuth and image helpers) and `@raster/react`
-(provider and hooks). The SDK is headless; everything on screen is this plugin's, in
-`@sanity/ui`.
-
-> **While the SDK is unpublished**, the two `@raster/*` dependencies point at a sibling
-> checkout with `link:../raster-plugin-sdk/...`, so `pnpm install` expects
-> `raster-plugin-sdk` next to this repository with its packages built (`pnpm build` there).
-> Replace them with the published ranges before releasing.
+The plugin is built on [`@raster-app/react`](https://www.npmjs.com/package/@raster-app/react),
+which carries the SDK's client, its hooks and `RasterPicker`. What the plugin adds is Sanity's
+side: the asset source, the tool, the key saved for the studio, and the picker's stylesheet.
 
 ```bash
 pnpm install
@@ -183,26 +182,22 @@ pnpm install
 
 ### How the pieces fit
 
-| File                      | What it does                                                             |
-| ------------------------- | ------------------------------------------------------------------------ |
-| `src/index.tsx`           | The plugin: the asset source and the tool.                               |
-| `src/client.ts`           | One `RasterClient` per Studio workspace, with Studio's host adapters.     |
-| `src/raster-studio-provider.tsx` | The workspace's client, for the `@raster/react` hooks.             |
-| `src/raster-sign-in-gate.tsx` | Connects with the studio key, or shows the sign-in screen.            |
-| `src/sign-in-panel.tsx`   | The device code sign-in.                                                 |
-| `src/use-studio-key.ts`   | Reads and writes that key in the `secrets.raster` document.              |
-| `src/studio-key-setup.tsx` | Where an administrator saves or removes it, in the tool.                |
-| `src/raster-browser.tsx`   | The organization → library → asset browser, shared by tool and picker.   |
-| `src/browser-header.tsx`  | The switcher, breadcrumb, actions and search box.                        |
-| `src/library-list.tsx`    | An organization's libraries.                                             |
-| `src/asset-grid.tsx`      | The asset grid, with infinite paging and blurhash placeholders.          |
-| `src/variant-view.tsx`    | One asset's default and variants, with the detail pane.                  |
-| `src/use-browser-actions.ts` | Upload and promote, and the busy, error and notice they report.       |
-| `src/asset-detail.tsx`     | The selected asset's facts and actions.                                  |
-| `src/loading-state.tsx`   | A spinner with a label.                                                  |
+| File                             | What it does                                                         |
+| -------------------------------- | -------------------------------------------------------------------- |
+| `src/index.tsx`                  | The plugin: the asset source and the tool.                           |
+| `src/raster-asset-source.tsx`    | The picker in a dialog, handing Sanity the picked image.             |
+| `src/raster-tool.tsx`            | The picker in a pane, where picking copies the asset's URL.          |
+| `src/raster-studio-picker.tsx`   | `RasterPicker` with its stylesheet and the Studio's color scheme.    |
+| `src/raster-studio-provider.tsx` | The workspace's client, for `RasterPicker`.                          |
+| `src/client.ts`                  | One `RasterClient` per Studio workspace and pinned organization.     |
+| `src/raster-sign-in-gate.tsx`    | Connects with the studio key before the picker offers to sign in.    |
+| `src/use-studio-key.ts`          | Reads and writes that key in the `secrets.raster` document.          |
+| `src/studio-key-setup.tsx`       | Where an administrator saves or removes it, in the tool.             |
+| `src/loading-state.tsx`          | A spinner with a label.                                              |
 
-There is no stylesheet: layout is `Flex`, `Grid` and `Box`, and colour comes from `Card` tones,
-so the plugin follows the Studio's theme without a token map.
+The picker's stylesheet, `@raster-app/react/styles.css`, is inlined into the build and added to
+the page the first time the picker renders, since a Studio can't be asked to import a plugin's
+CSS. Its rules are scoped under `.rs`.
 
 ## Contributing
 

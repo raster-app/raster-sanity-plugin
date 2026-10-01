@@ -1,13 +1,11 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { useRasterClient, useSession } from '@raster/react'
-import { toUserMessage } from '@raster/sdk'
-import { Card, Flex, Text } from '@sanity/ui'
+import { toUserMessage, useRasterClient, useSession } from '@raster-app/react'
+import { Box, Card, Flex, Text } from '@sanity/ui'
 import { LoadingState } from './loading-state'
-import { SignInPanel } from './sign-in-panel'
 import { StudioKeySetup } from './studio-key-setup'
 import { useStudioKey } from './use-studio-key'
 
-/** Renders its children once there is a credential; a key saved for the studio is used first. */
+/** Connects with the key saved for the studio before the picker offers to sign in. */
 export function RasterSignInGate({
 	allowStudioKeySetup = false,
 	children,
@@ -46,15 +44,13 @@ export function RasterSignInGate({
 		)
 	}, [client, studioKey.key, credentials, isConfigured])
 
-	if (isConfigured) return <>{children}</>
+	if (configuredKey.status === 'connecting') return <LoadingState label="Connecting to Raster…" />
 
-	if (credentials === undefined || configuredKey.status === 'connecting') {
-		return <LoadingState label="Connecting to Raster…" />
-	}
+	const isSignedOut = credentials !== undefined && !isConfigured
 
 	return (
-		<Flex direction="column" gap={4} padding={4}>
-			{configuredKey.status === 'failed' && (
+		<Flex direction="column" gap={3} style={{ height: '100%', minHeight: 0 }}>
+			{isSignedOut && configuredKey.status === 'failed' && (
 				<Card tone="critical" padding={3} radius={2} border>
 					<Text size={1}>
 						The API key saved for this studio was refused: {configuredKey.message}
@@ -62,9 +58,11 @@ export function RasterSignInGate({
 				</Card>
 			)}
 
-			<SignInPanel />
+			{isSignedOut && allowStudioKeySetup && <StudioKeySetup />}
 
-			{allowStudioKeySetup && <StudioKeySetup />}
+			<Box flex={1} style={{ minHeight: 0 }}>
+				{children}
+			</Box>
 		</Flex>
 	)
 }

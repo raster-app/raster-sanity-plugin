@@ -1,56 +1,44 @@
-import React, { Suspense, useCallback } from 'react'
-import { getFullSizeUrl } from '@raster/sdk'
-import { Box, Dialog } from '@sanity/ui'
+import { useState } from 'react'
+import { getFullSizeUrl, type Asset } from '@raster-app/react'
+import { Box, Card, Dialog, Text } from '@sanity/ui'
 import type { AssetFromSource } from 'sanity'
-import { RasterBrowserFallback } from './raster-fallback'
-import { RasterStudioProvider } from './raster-studio-provider'
-import type { RasterAssetSourceProps, RasterItem } from './types'
-
-// Lazy because Studio extracts schemas in Node, and the browser reaches the DOM. The `catch`
-// keeps a failed chunk from breaking the form.
-const RasterBrowser = React.lazy(() =>
-	import('./raster-browser')
-		.then((module) => ({ default: module.RasterBrowser }))
-		.catch((caught: unknown) => {
-			console.error(caught)
-			return { default: () => <RasterBrowserFallback label="Raster failed to load." /> }
-		})
-)
+import { RasterStudioPicker } from './raster-studio-picker'
+import { isImage, type RasterAssetSourceProps } from './types'
 
 /** The Raster picker, as an image field's asset source. */
 export function RasterAssetSource(props: RasterAssetSourceProps) {
 	const { config, onSelect, onClose, dialogHeaderTitle } = props
+	const [refused, setRefused] = useState(false)
 
-	const handlePick = useCallback(
-		(item: RasterItem) => {
-			// A search hit has no `url` of its own, only renditions.
-			const url = getFullSizeUrl(item)
-			if (url === null) return
+	function handlePick(asset: Asset) {
+		// Sanity would only fail on it after the dialog has closed.
+		if (!isImage(asset)) {
+			setRefused(true)
+			return
+		}
+		const url = getFullSizeUrl(asset)
+		if (url === null) return
 
-			const asset: AssetFromSource = {
-				kind: 'url',
-				value: url,
-				// biome-ignore lint/plugin: Sanity types this as a stored `ImageAsset`; Studio fills in the rest once it has the file.
-				assetDocumentProps: {
-					originalFilename: item.name ?? undefined,
-					source: {
-						name: 'raster',
-						// Always the asset, even for a variant, so a document can tell which asset it
-						// holds; `url` still opens the exact variant that was picked.
-						id: item.parentId ?? item.id,
-						url: item.appUrl ?? undefined,
-					},
-					...('description' in item && item.description != null && item.description !== ''
-						? { description: item.description }
-						: {}),
-				} as AssetFromSource['assetDocumentProps'],
-			}
+		const picked: AssetFromSource = {
+			kind: 'url',
+			value: url,
+			// biome-ignore lint/plugin: Sanity types this as a stored `ImageAsset`; Studio fills in the rest once it has the file.
+			assetDocumentProps: {
+				originalFilename: asset.name ?? undefined,
+				source: {
+					name: 'raster',
+					// Always the asset, even for a variant, so a document can tell which asset it
+					// holds; `url` still opens the exact variant that was picked.
+					id: asset.parentId ?? asset.id,
+					url: asset.appUrl ?? undefined,
+				},
+				...(asset.description ? { description: asset.description } : {}),
+			} as AssetFromSource['assetDocumentProps'],
+		}
 
-			onSelect([asset])
-			onClose()
-		},
-		[onSelect, onClose]
-	)
+		onSelect([picked])
+		onClose()
+	}
 
 	return (
 		<Dialog
@@ -61,13 +49,16 @@ export function RasterAssetSource(props: RasterAssetSourceProps) {
 			position="fixed"
 			zOffset={99999999}
 			style={{ height: '96vh', marginTop: '40px' }}
+			footer={
+				refused ? (
+					<Card tone="caution" padding={3} role="alert">
+						<Text size={1}>Only images can be used in this field.</Text>
+					</Card>
+				) : undefined
+			}
 		>
-			<Box padding={4} style={{ height: '100%', minHeight: 0 }}>
-				<RasterStudioProvider>
-					<Suspense fallback={<RasterBrowserFallback />}>
-						<RasterBrowser config={config} onPick={handlePick} pickLabel="Use this image" />
-					</Suspense>
-				</RasterStudioProvider>
+			<Box style={{ height: '100%', minHeight: 0 }}>
+				<RasterStudioPicker config={config} onPick={handlePick} />
 			</Box>
 		</Dialog>
 	)

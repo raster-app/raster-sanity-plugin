@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { toUserMessage } from '@raster/sdk'
+import { toUserMessage } from '@raster-app/react'
 import { Button, Card, Flex, Text, TextInput } from '@sanity/ui'
 import { useCurrentUser } from 'sanity'
 import { verifyApiKey } from './client'
