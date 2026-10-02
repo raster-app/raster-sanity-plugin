@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@raster-app/react':
-        specifier: 0.1.0-canary-623b3d3
-        version: 0.1.0-canary-623b3d3(react@19.3.0)
+        specifier: 0.1.0-canary-32ca74d
+        version: 0.1.0-canary-32ca74d(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@sanity/icons':
         specifier: ^3.7.4 || ^5.2.2
         version: 5.2.2(react@19.3.0)
@@ -2253,14 +2253,14 @@ packages:
     resolution: {integrity: sha512-djfIGU9n6DRrunlvj2nIDAp17URo/nA4jSXGvf+Gupx8NLLy9fmJBZ3GL8yhqn9lSVc+cKCharjOa3aOBnWbRw==}
     engines: {node: '>=20.19 <22 || >=22.12'}
 
-  '@raster-app/react@0.1.0-canary-623b3d3':
-    resolution: {integrity: sha512-zyQY95FxWifeyFBa8ounZYQFKhtzTa3+d9LwUlHxFyIpNto1nI5QBnwNCc5V+j3OHjmRDoAz6xFVpztbLnhfbQ==}
+  '@raster-app/react@0.1.0-canary-32ca74d':
+    resolution: {integrity: sha512-nonvNOC2AxclQud1BHMjSZYWMqR5JV9A15kuibarR50YhR2bo7SEt6xaFmNNV4mwY06bkUEFe8agDjBin7yuvA==}
     engines: {node: '>=22.12'}
     peerDependencies:
       react: ^18 || ^19
 
-  '@raster-app/sdk@0.1.0-canary-623b3d3':
-    resolution: {integrity: sha512-ysFn9CUnP3KD6Na7JsIM5mjYLzm/lrxWPzmRfv3HBNaN3j849yZBJLnaUtXtQw4hnmV3+aiiUNHsRWwDPce4yA==}
+  '@raster-app/sdk@0.1.0-canary-32ca74d':
+    resolution: {integrity: sha512-w/FGOVCAUhynWv8f0le456JF3n10ieCwjVHm1pTw7nGIb1KZ3Ol5IwxeXmWYCCJMOLZap6qgHPdAA3m0KmiRWg==}
     engines: {node: '>=22.12'}
 
   '@rexxars/choosealicense-list@1.1.2':
@@ -9760,13 +9760,16 @@ snapshots:
 
   '@portabletext/types@4.0.2': {}
 
-  '@raster-app/react@0.1.0-canary-623b3d3(react@19.3.0)':
+  '@raster-app/react@0.1.0-canary-32ca74d(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
-      '@raster-app/sdk': 0.1.0-canary-623b3d3
+      '@raster-app/sdk': 0.1.0-canary-32ca74d
       '@tanstack/react-query': 5.103.2(react@19.3.0)
+      '@tanstack/react-virtual': 3.14.13(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react: 19.3.0
+    transitivePeerDependencies:
+      - react-dom
 
-  '@raster-app/sdk@0.1.0-canary-623b3d3': {}
+  '@raster-app/sdk@0.1.0-canary-32ca74d': {}
 
   '@rexxars/choosealicense-list@1.1.2': {}
 
