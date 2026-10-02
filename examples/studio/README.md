@@ -1,6 +1,6 @@
 # Studio example
 
-The plugin in a Sanity Studio, for testing it by hand against Raster. Private, never published.
+The plugin in a Sanity Studio, for testing it by hand against Raster. It is never published to npm.
 
 ## Run
 
