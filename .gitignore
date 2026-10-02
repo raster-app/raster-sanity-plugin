@@ -30,3 +30,8 @@ yalc.lock
 # Other
 plugin-examples
 .cursor
+.sanity
+.env*
+!.env.example
+# TypeScript build cache
+*.tsbuildinfo

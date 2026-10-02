@@ -1,0 +1,10 @@
+engine biome(1.0)
+language js(typescript, jsx)
+
+TsAsExpression() as $cast where {
+    not $cast <: `$_ as const`,
+    register_diagnostic(
+        span = $cast,
+        message = "Use type guards or generics instead of `as` type assertions. `as const` is allowed. Add `// biome-ignore` with justification if unavoidable."
+    )
+}
