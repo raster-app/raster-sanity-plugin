@@ -58,20 +58,24 @@ dataset with the Sanity CLI, which needs `pnpm exec sanity login` once.
 10. Open an asset with versions, choose a variant and Pick asset: the query shows the original's
     id in `source.id`, and `source.url` opens the variant.
 11. Pick a video or a PDF: "Only images can be used in this field.", and the picker stays open.
+    Open the organization switcher and press Escape: only the menu closes.
 
 **The tool**
 
 12. Raster Assets fills the pane and only browses: an opened asset has Open in Raster but no
-    Pick asset.
+    Pick asset. In a library of several hundred assets, scrolling stays smooth, the next page loads
+    as you near the end, switching libraries is quick, and a row holds as many tiles as the Raster
+    app shows at the same width.
 
 **Search, uploads and versions**, in a library you can write to
 
 13. Search runs once typing pauses and shows the count. Picking a hit fills the field as in 9.
 14. Upload from the library's menu, then by dropping a file on the grid: its tile shows until
-    "Uploaded".
+    "Uploaded". While it uploads, the upload buttons are disabled and a second dropped file is
+    ignored.
 15. Open an asset and Upload variant: the version count goes up. Set as default, then Confirm:
-    "Default set". Pick it again: the field takes the new default, and documents holding the old
-    one keep it.
+    Pick asset stays disabled until "Default set". Pick it again: the field takes the new default,
+    and documents holding the old one keep it.
 
 **Light and dark**
 
