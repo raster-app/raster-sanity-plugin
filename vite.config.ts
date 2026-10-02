@@ -28,8 +28,7 @@ export default defineConfig({
 				'styled-components',
 				'@sanity/ui',
 				'@sanity/icons',
-				'@raster/sdk',
-				'@raster/react',
+				'@raster-app/react',
 			],
 			output: [
 				{

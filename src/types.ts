@@ -1,22 +1,18 @@
-import type { Asset, AssetVariant } from '@raster/sdk'
+import type { Asset } from '@raster-app/react'
 import type { AssetSourceComponentProps } from 'sanity'
 
 export interface RasterConfig {
-	/** Pin the plugin to one organization and hide the switcher. */
+	/** Pin the plugin to one organization: a sign-in that grants any other fails. */
 	orgId?: string
 }
 
-/** A top-level asset or one of its variants. */
-export type RasterItem = Asset | AssetVariant
-
-/** Only a top-level asset belongs to a library. */
-export function isVariant(item: RasterItem): item is AssetVariant {
-	return !('libraryId' in item)
-}
-
-/** Libraries also hold video and PDF. Variants carry no type, so pass their asset. */
+/**
+ * Libraries also hold video and PDF, which an image field cannot take. Some variant rows carry no
+ * type of their own; those pass, since a variant shares its original's kind.
+ */
 export function isImage(asset: Asset): boolean {
-	return asset.contentType?.startsWith('image/') === true
+	if (asset.contentType === null) return asset.parentId !== null
+	return asset.contentType.startsWith('image/')
 }
 
 export interface RasterAssetSourceProps extends AssetSourceComponentProps {

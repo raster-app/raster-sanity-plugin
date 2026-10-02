@@ -9,7 +9,9 @@ export * from './types'
 /** Adds Raster as an asset source on every image field, and a Raster tool. */
 // biome-ignore lint/suspicious/noConfusingVoidType: `void` is what makes the argument optional, so `rasterPlugin()` works.
 export const rasterPlugin = definePlugin<RasterConfig | void>((config) => {
-	const settings: RasterConfig = config ?? {}
+	const given: RasterConfig = config ?? {}
+	// An empty id, as an unset environment variable gives, pins nothing.
+	const settings: RasterConfig = { ...given, orgId: given.orgId || undefined }
 
 	// A 1.x config may still pass it.
 	if ('apiKey' in settings) {

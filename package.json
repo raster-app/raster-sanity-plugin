@@ -45,8 +45,7 @@
 		"check": "biome check --write ."
 	},
 	"dependencies": {
-		"@raster/react": "link:../raster-plugin-sdk/packages/react",
-		"@raster/sdk": "link:../raster-plugin-sdk/packages/sdk",
+		"@raster-app/react": "0.1.0-canary-623b3d3",
 		"@sanity/icons": "^3.7.4 || ^5.2.2"
 	},
 	"peerDependencies": {
