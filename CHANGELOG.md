@@ -8,8 +8,8 @@ the asset source.
 
 ### Breaking changes
 
-- **Requires Sanity 4 or later and React 19.** Sanity v3 is no longer supported; stay on 1.0.14
-  if you cannot upgrade Studio.
+- **Requires Sanity 4 or later, React 19 and Node.js 22.12 or later.** Sanity v3 is no longer
+  supported; stay on 1.0.14 if you cannot upgrade Studio.
 - **`@sanity/ui` is now a peer dependency.** 1.0.14 installed its own copy (`3.0.14`). The plugin
   now uses the Studio's copy (3.x or 4.x), which every studio already has through `sanity`, so
   nothing needs installing.

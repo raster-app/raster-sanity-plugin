@@ -6,9 +6,13 @@ export interface RasterConfig {
 	orgId?: string
 }
 
-/** Libraries also hold video and PDF, which an image field cannot take. */
+/**
+ * Libraries also hold video and PDF, which an image field cannot take. Some variant rows carry no
+ * type of their own; those pass, since a variant shares its original's kind.
+ */
 export function isImage(asset: Asset): boolean {
-	return asset.contentType?.startsWith('image/') === true
+	if (asset.contentType === null) return asset.parentId !== null
+	return asset.contentType.startsWith('image/')
 }
 
 export interface RasterAssetSourceProps extends AssetSourceComponentProps {

@@ -28,11 +28,14 @@ dataset with the Sanity CLI, which needs `pnpm exec sanity login` once.
 2. Sign out, sign in again and narrow the grant to one organization: only it shows. Cancel a
    sign-in: no error. Deny one on the consent page: "The sign-in was denied in the browser."
 3. Set `SANITY_STUDIO_RASTER_ORG_ID` to that organization's id and restart: Raster Assets starts
-   signed out, asks you to choose that organization, and has no API key field. Granting it signs
-   in, showing only it.
+   signed out and asks you to choose that organization. The picker's sign-in has no API key
+   field; "Connect everyone with an API key" above it stays. Granting it signs in, showing only
+   it.
 4. Still pinned, sign out and grant another organization: "That sign-in doesn’t match the Raster
-   organization this app uses. Sign in again and choose that organization." Empty the variable
-   and restart: the sign-in from step 2 is still there.
+   organization this app uses. Sign in again and choose that organization." Save a key from
+   another organization under "Connect everyone with an API key": "That key is for another
+   Raster organization than …". Empty the variable and restart: the sign-in from step 2 is still
+   there.
 
 **API keys**, unpinned
 
@@ -58,8 +61,8 @@ dataset with the Sanity CLI, which needs `pnpm exec sanity login` once.
 
 **The tool**
 
-12. Raster Assets fills the pane. Pick asset reads "Copied the asset URL:" and the URL, and the
-    pasted URL opens the full-size image.
+12. Raster Assets fills the pane and only browses: an opened asset has Open in Raster but no
+    Pick asset.
 
 **Search, uploads and versions**, in a library you can write to
 

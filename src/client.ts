@@ -3,6 +3,7 @@ import {
 	localStorageCredentialStore,
 	localStorageStateStore,
 	memoryCredentialStore,
+	RasterApiError,
 	type RasterClient,
 	type StateStore,
 } from '@raster-app/react'
@@ -46,8 +47,27 @@ export function getRasterClient(
 	return created
 }
 
+/**
+ * Connects an organization API key. `auth.connect` can't bind a key to an organization, so a
+ * pinned studio checks the one the key reached and refuses any other.
+ */
+export async function connectStudioKey(
+	client: RasterClient,
+	apiKey: string,
+	orgId: string | undefined
+): Promise<void> {
+	const { organizations } = await client.auth.connect({ apiKey })
+	if (orgId === undefined || organizations.some((organization) => organization.id === orgId)) return
+	await client.auth.signOut()
+	throw new RasterApiError(
+		`That key is for another Raster organization than ${orgId}.`,
+		'ORGANIZATION_MISMATCH',
+		403
+	)
+}
+
 /** Checks a key with Raster without storing it anywhere. */
-export async function verifyApiKey(apiKey: string): Promise<void> {
+export async function verifyApiKey(apiKey: string, orgId: string | undefined): Promise<void> {
 	const client = createRasterClient({ host: HOST, credentials: memoryCredentialStore() })
-	await client.auth.connect({ apiKey })
+	await connectStudioKey(client, apiKey, orgId)
 }

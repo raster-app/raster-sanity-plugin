@@ -30,7 +30,8 @@ export function RasterStudioPicker({
 	allowStudioKeySetup,
 }: {
 	config: RasterConfig
-	onPick: (asset: Asset) => void
+	/** Without it, the picker only browses. */
+	onPick?: (asset: Asset) => void
 	/** Let an admin save an API key for the studio. The tool only. */
 	allowStudioKeySetup?: boolean
 }) {
@@ -39,7 +40,7 @@ export function RasterStudioPicker({
 
 	return (
 		<RasterStudioProvider config={config}>
-			<RasterSignInGate allowStudioKeySetup={allowStudioKeySetup}>
+			<RasterSignInGate orgId={config.orgId} allowStudioKeySetup={allowStudioKeySetup}>
 				<RasterPicker
 					organizationId={config.orgId}
 					onPick={onPick}

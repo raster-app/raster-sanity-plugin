@@ -13,7 +13,6 @@ Raster draws them.
 - **Asset source on every image field** — pick an image from Raster without leaving the
   document, and the Raster asset's id and app link are recorded on the Sanity asset.
 - **A Raster tool** for browsing libraries on their own, with the whole pane to work in.
-  Picking an asset there copies its URL.
 - **Sign in from inside Studio** with the device code flow, or connect everyone with an
   organization API key an admin saves once. No credentials in your Studio config.
 - **Organization switcher** for a credential that reaches more than one.
@@ -37,6 +36,7 @@ pnpm add @raster-app/sanity-plugin-raster
 | `sanity` | 4.x, 5.x, 6.x |
 | `@sanity/ui` | 3.x, 4.x |
 | `react` | 19 |
+| Node.js | 22.12 or later |
 
 Upgrading from 1.x, which supported Sanity v3? See the [migration notes](CHANGELOG.md#migrating-from-1x).
 
@@ -101,16 +101,17 @@ ship in the Studio bundle. It is not hidden from your team, though:
 - **Dataset exports include it.**
 
 So create the key for this Studio alone, with access to only the libraries it needs. With
-`orgId` set, create it in that organization: the plugin uses whichever organization a saved key
-belongs to.
+`orgId` set, the key must belong to that organization; a key for another is refused.
 
 ### Where the session is stored
 
 The credential is kept in `localStorage`, per browser, Studio workspace and pinned
 organization, so editors sign in once rather than on every reload. It also means **any script
 or plugin running on the Studio's origin can read the token** — the usual trade for an admin UI,
-but worth making deliberately. Signing out clears it and asks Raster to revoke the session, and an editor can
-also revoke it in Raster under **Settings > Connected apps**.
+but worth making deliberately. Signing out clears it and asks Raster to revoke a signed-in
+session, which an editor can also revoke in Raster under **Settings > Connected apps**. An
+organization API key an editor connects in the picker is stored the same way; signing out only
+forgets it, so revoke it in Raster under **Organization settings > API keys**.
 
 ## Usage
 
@@ -189,7 +190,7 @@ pnpm install
 | -------------------------------- | -------------------------------------------------------------------- |
 | `src/index.tsx`                  | The plugin: the asset source and the tool.                           |
 | `src/raster-asset-source.tsx`    | The picker in a dialog, handing Sanity the picked image.             |
-| `src/raster-tool.tsx`            | The picker in a pane, where picking copies the asset's URL.          |
+| `src/raster-tool.tsx`            | The picker in a pane, for browsing.                                  |
 | `src/raster-studio-picker.tsx`   | `RasterPicker` with its stylesheet and the Studio's color scheme.    |
 | `src/raster-studio-provider.tsx` | The workspace's client, for `RasterPicker`.                          |
 | `src/client.ts`                  | One `RasterClient` per Studio workspace and pinned organization.     |

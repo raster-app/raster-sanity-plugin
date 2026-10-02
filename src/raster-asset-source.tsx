@@ -32,7 +32,8 @@ export function RasterAssetSource(props: RasterAssetSourceProps) {
 					id: asset.parentId ?? asset.id,
 					url: asset.appUrl ?? undefined,
 				},
-				...(asset.description ? { description: asset.description } : {}),
+				// An original's only: the asset document of a variant carries none.
+				...(asset.parentId === null && asset.description ? { description: asset.description } : {}),
 			} as AssetFromSource['assetDocumentProps'],
 		}
 
@@ -48,7 +49,6 @@ export function RasterAssetSource(props: RasterAssetSourceProps) {
 			width={4}
 			position="fixed"
 			zOffset={99999999}
-			style={{ height: '96vh', marginTop: '40px' }}
 			footer={
 				refused ? (
 					<Card tone="caution" padding={3} role="alert">
@@ -57,7 +57,8 @@ export function RasterAssetSource(props: RasterAssetSourceProps) {
 				) : undefined
 			}
 		>
-			<Box style={{ height: '100%', minHeight: 0 }}>
+			{/* The dialog sizes to its content, and the picker needs a fixed height to scroll in. */}
+			<Box style={{ height: '80vh' }}>
 				<RasterStudioPicker config={config} onPick={handlePick} />
 			</Box>
 		</Dialog>
