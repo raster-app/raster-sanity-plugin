@@ -27,9 +27,11 @@ export function StudioKeySetup({ orgId }: { orgId: string | undefined }) {
 		try {
 			await verifyApiKey(apiKey, orgId)
 			await studioKey.save(apiKey)
+			setDraft('')
 		} catch (caught) {
 			console.error(caught)
 			setError(toUserMessage(caught))
+		} finally {
 			setStatus('idle')
 		}
 	}
