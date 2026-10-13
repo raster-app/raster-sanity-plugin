@@ -6,7 +6,7 @@ straight into any image field.
 
 Built on [`@raster-app/react`](https://www.npmjs.com/package/@raster-app/react), Raster's
 drop-in asset picker: the same sign-in, browsing and uploads as Raster's other plugins, drawn as
-Raster draws them.
+Raster draws them. See the [SDK docs](https://raster.app/docs/api/sdk) for the picker itself.
 
 ## Features
 
@@ -23,9 +23,15 @@ Raster draws them.
 
 ## Installation
 
+With npm:
+
 ```bash
 npm install @raster-app/sanity-plugin-raster
-# or
+```
+
+Or with pnpm:
+
+```bash
 pnpm add @raster-app/sanity-plugin-raster
 ```
 
@@ -33,16 +39,15 @@ pnpm add @raster-app/sanity-plugin-raster
 
 | | Supported |
 | --- | --- |
-| `sanity` | 4.x, 5.x, 6.x |
+| `sanity` | 4.2 or later, 5.x, 6.x |
 | `@sanity/ui` | 3.x, 4.x |
 | `react` | 19 |
 | Node.js | 22.12 or later |
 
-Upgrading from 1.x, which supported Sanity v3? See the [migration notes](CHANGELOG.md#migrating-from-1x).
-
 `@sanity/ui` is a **peer dependency**, not a dependency — it carries the Studio's theme through
-React context, and a second copy means a component that cannot read it. Every studio already has
-it by way of `sanity`, so there is nothing to install.
+React context, and a second copy means a component that cannot read it. Every supported studio
+already has it by way of `sanity`, so there is nothing to install. Sanity 4.0 and 4.1 ship
+`@sanity/ui` 2.x, which is why the plugin needs 4.2.
 
 The plugin only uses what the package root exports in both 3.x and 4.x: `Box`, `Button`,
 `Card`, `Dialog`, `Flex`, `Spinner`, `Text` and `TextInput`, laid out with `Flex`'s `gap`, which
@@ -52,6 +57,17 @@ both versions accept. Some things are avoided on purpose:
   with no spelling valid in both. `<Flex direction="column" gap={3}>` does the same job.
 - **`MenuButton`, `Menu`, `Breadcrumbs`, `Tooltip`, `Popover`, `Code` and `useToast`**, which
   4.x moved to subpaths that 3.x does not have.
+
+## Upgrading from 1.x
+
+2.0.0 needs Sanity 4.2 or later; stay on 1.0.14 for Sanity v3. Then:
+
+1. Remove `apiKey` from `rasterPlugin(...)`. Left in, it only logs a warning.
+2. Either let editors sign in with their own Raster accounts, or have an administrator save an
+   organization API key in the Raster tool (see [An API key for everyone](#an-api-key-for-everyone)).
+3. Replace any import of the `RasterImage` type with `Asset` from `@raster-app/react`.
+
+Documents need no changes. The [changelog](CHANGELOG.md#200) has the full list.
 
 ## Setup
 
@@ -166,20 +182,24 @@ side: the asset source, the tool, the key saved for the studio, and the picker's
 ```bash
 pnpm install
 pnpm typecheck
-pnpm check   # Biome: format and lint, applying safe fixes
+pnpm check
 pnpm build
 ```
+
+`pnpm check` runs Biome's formatter and linter, applying safe fixes.
 
 [`examples/studio`](examples/studio) is a Studio that loads the plugin from `src/`, for trying it
 by hand. Its README holds the setup and the manual QA checklist.
 
-To try the built plugin in another Studio:
+To try the built plugin in another Studio, run this in the plugin directory:
 
 ```bash
-# In the plugin directory
 pnpm link-watch
+```
 
-# In your Sanity studio directory
+Then, in your Studio's directory:
+
+```bash
 pnpm yalc add @raster-app/sanity-plugin-raster
 pnpm install
 ```
