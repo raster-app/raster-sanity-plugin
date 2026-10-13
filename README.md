@@ -108,9 +108,11 @@ sign-in screen. Editors are then connected without signing in. The key is read o
 and kept in memory rather than in editors' browsers, so a rotated key takes effect on the next
 load.
 
-The key is stored in the dataset, in a document with the id `secrets.raster`. Sanity only
-returns documents with a dot in their id to signed-in users, so it is not public and does not
-ship in the Studio bundle. It is not hidden from your team, though:
+The key is stored in the dataset, in a document with the id `secrets.raster`, or
+`secrets.raster.<orgId>` when the plugin is pinned, so workspaces pinned to different
+organizations keep their own key. Sanity only returns documents with a dot in their id to
+signed-in users, so it is not public and does not ship in the Studio bundle. It is not hidden
+from your team, though:
 
 - **Anyone signed in to the Studio who can read documents can read the key.** Custom roles,
   available on Enterprise plans, can limit that.
@@ -215,7 +217,7 @@ pnpm install
 | `src/raster-studio-provider.tsx` | The workspace's client, for `RasterPicker`.                          |
 | `src/client.ts`                  | One `RasterClient` per Studio workspace and pinned organization.     |
 | `src/raster-sign-in-gate.tsx`    | Connects with the studio key before the picker offers to sign in.    |
-| `src/use-studio-key.ts`          | Reads and writes that key in the `secrets.raster` document.          |
+| `src/use-studio-key.ts`          | Reads and writes that key in its `secrets.raster` document.          |
 | `src/studio-key-setup.tsx`       | Where an administrator saves or removes it, in the tool.             |
 | `src/loading-state.tsx`          | A spinner with a label.                                              |
 

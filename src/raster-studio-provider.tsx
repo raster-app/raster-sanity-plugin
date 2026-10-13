@@ -15,7 +15,7 @@ export function RasterStudioProvider({
 	children: ReactNode
 }) {
 	const workspace = useWorkspace().name
-	const studioKey = useStudioKeyDocument()
+	const studioKey = useStudioKeyDocument(config.orgId)
 
 	// Which credential store the client gets depends on whether a key is saved.
 	if (studioKey.key === undefined) return <LoadingState label="Connecting to Raster…" />
