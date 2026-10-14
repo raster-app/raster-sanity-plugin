@@ -82,8 +82,10 @@ export function RasterAssetSource(props: RasterAssetSourceProps) {
 				)
 			}
 		>
-			{/* The dialog sizes to its content, and the picker needs a fixed height to scroll in. */}
-			<Box style={{ height: '80vh' }}>
+			{/* The dialog sizes to its content, and the picker needs a fixed height to scroll in.
+			    Any click clears the refusal, so it never sits under another asset; Pick asset's
+			    own handler runs after this one and sets it again. */}
+			<Box style={{ height: '80vh' }} onClickCapture={() => setRefused(null)}>
 				<RasterStudioPicker config={config} onPick={handlePick} />
 			</Box>
 		</Dialog>
