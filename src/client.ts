@@ -1,12 +1,17 @@
 import {
+	type CredentialStore,
 	createRasterClient,
 	localStorageCredentialStore,
 	localStorageStateStore,
+	type Me,
+	meCredentialOrganizations,
 	memoryCredentialStore,
 	RasterApiError,
 	type RasterClient,
+	SIGNED_OUT,
 	type StateStore,
 } from '@raster-app/react'
+import { QueryClient } from '@tanstack/react-query'
 
 const HOST = {
 	/** What Raster's consent page, Connected apps and the sign-in screen call this host. */
@@ -16,49 +21,80 @@ const HOST = {
 	},
 }
 
-// One per workspace and pinned organization, each with its own sign-in, so one made without
-// the pin is never reused under it.
-const clients = new Map<string, { client: RasterClient; state: StateStore }>()
+/**
+ * What a workspace's Raster sign-in, browsing state and caches are kept under. The project and
+ * dataset are in it so studios sharing an origin, such as several run on localhost:3333, don't
+ * share one under the default workspace name.
+ */
+export function rasterScope(
+	workspace: { name: string; projectId: string; dataset: string },
+	orgId: string | undefined
+): string {
+	const scope = `raster.${workspace.projectId}.${workspace.dataset}.${workspace.name}`
+	return orgId === undefined ? scope : `${scope}.org.${orgId}`
+}
+
+// One per scope, each with its own sign-in, so one made without the pin is never reused under
+// it. The query cache lives as long, so reopening the picker doesn't fetch everything again.
+const clients = new Map<
+	string,
+	{ client: RasterClient; state: StateStore; queryClient: QueryClient }
+>()
+
+// Keys connected as the studio's on this page.
+const studioKeys = new Set<string>()
 
 /**
- * With a studio key, the credential is kept in memory and connected on every load, so a
- * rotated key takes effect on the next one instead of a stored copy outliving it.
+ * Stores an editor's own sign-in, but a studio key only as signed out, keeping the client
+ * registration: each load then connects the key saved at that point, so a rotated key takes
+ * effect instead of a stored copy outliving it.
  */
-export function getRasterClient(
-	workspace: string,
-	orgId: string | undefined,
-	hasStudioKey: boolean
-): { client: RasterClient; state: StateStore } {
-	const prefix = orgId === undefined ? `raster.${workspace}` : `raster.${workspace}.org.${orgId}`
-	const cacheKey = `${prefix}|${hasStudioKey ? 'studio-key' : 'session'}`
-	const existing = clients.get(cacheKey)
+function withoutStudioKeys(store: CredentialStore): CredentialStore {
+	return {
+		...store,
+		save: (credentials) =>
+			store.save(
+				credentials.apiKey !== null && studioKeys.has(credentials.apiKey)
+					? { ...SIGNED_OUT, clientId: credentials.clientId }
+					: credentials
+			),
+	}
+}
+
+export function getRasterClient(scope: string): {
+	client: RasterClient
+	state: StateStore
+	queryClient: QueryClient
+} {
+	const existing = clients.get(scope)
 	if (existing !== undefined) return existing
 
 	const created = {
 		client: createRasterClient({
 			host: HOST,
-			credentials: hasStudioKey
-				? memoryCredentialStore()
-				: localStorageCredentialStore(`${prefix}.credentials`),
+			credentials: withoutStudioKeys(localStorageCredentialStore(`${scope}.credentials`)),
 		}),
-		state: localStorageStateStore(`${prefix}.state.`),
+		state: localStorageStateStore(`${scope}.state.`),
+		// RasterProvider's own defaults, which it applies only to a QueryClient it creates.
+		queryClient: new QueryClient({
+			defaultOptions: { queries: { staleTime: 60 * 1000, refetchOnWindowFocus: false } },
+		}),
 	}
-	clients.set(cacheKey, created)
+	clients.set(scope, created)
 	return created
 }
 
 /**
- * Connects an organization API key. `auth.connect` can't bind a key to an organization, so a
- * pinned studio checks the one the key reached and refuses any other.
+ * `auth.connect` can't bind a key to an organization, so a pinned studio checks the one the
+ * key reaches before anything adopts it.
  */
-export async function connectStudioKey(
+async function checkKey(
 	client: RasterClient,
 	apiKey: string,
 	orgId: string | undefined
-): Promise<void> {
-	const { organizations } = await client.auth.connect({ apiKey })
-	if (orgId === undefined || organizations.some((organization) => organization.id === orgId)) return
-	await client.auth.signOut()
+): Promise<Me> {
+	const me = await client.me(apiKey)
+	if (orgId === undefined || ('organizationId' in me && me.organizationId === orgId)) return me
 	throw new RasterApiError(
 		`That key is for another Raster organization than ${orgId}.`,
 		'ORGANIZATION_MISMATCH',
@@ -66,8 +102,27 @@ export async function connectStudioKey(
 	)
 }
 
+/** Connects a signed-out client with an organization API key, once Raster has accepted it. */
+export async function connectStudioKey(
+	client: RasterClient,
+	apiKey: string,
+	orgId: string | undefined
+): Promise<void> {
+	const key = apiKey.trim()
+	const me = await checkKey(client, key, orgId)
+	const { clientId } = client.session.current() ?? (await client.session.hydrate())
+	studioKeys.add(key)
+	await client.session.save({
+		clientId,
+		apiKey: key,
+		oauth: null,
+		userName: null,
+		organizations: meCredentialOrganizations(me),
+	})
+}
+
 /** Checks a key with Raster without storing it anywhere. */
 export async function verifyApiKey(apiKey: string, orgId: string | undefined): Promise<void> {
 	const client = createRasterClient({ host: HOST, credentials: memoryCredentialStore() })
-	await connectStudioKey(client, apiKey, orgId)
+	await checkKey(client, apiKey.trim(), orgId)
 }

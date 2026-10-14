@@ -127,13 +127,16 @@ organization, and custom roles can restrict who may edit it.
 
 ### Where the session is stored
 
-The credential is kept in `localStorage`, per browser, Studio workspace and pinned
+The credential is kept in `localStorage`, per browser, project, dataset, workspace and pinned
 organization, so editors sign in once rather than on every reload. It also means **any script
 or plugin running on the Studio's origin can read the token** — the usual trade for an admin UI,
 but worth making deliberately. Signing out clears it and asks Raster to revoke a signed-in
 session, which an editor can also revoke in Raster under **Settings > Connected apps**. An
 organization API key an editor connects in the picker is stored the same way; signing out only
-forgets it, so revoke it in Raster under **Organization settings > API keys**.
+forgets it, so revoke it in Raster under **Organization settings > API keys**. The key saved for
+the studio is never stored there. An editor who signs in themselves keeps that session when a
+key is saved for the studio, and is connected with the studio's key from the next load after
+they sign out.
 
 ## Usage
 
@@ -220,7 +223,7 @@ pnpm install
 | `src/raster-tool.tsx`            | The picker in a pane, for browsing.                                  |
 | `src/raster-studio-picker.tsx`   | `RasterPicker` with its stylesheet and the Studio's color scheme.    |
 | `src/raster-studio-provider.tsx` | The workspace's client, for `RasterPicker`.                          |
-| `src/client.ts`                  | One `RasterClient` per Studio workspace and pinned organization.     |
+| `src/client.ts`                  | One `RasterClient` per project, dataset, workspace and pinned org.   |
 | `src/raster-sign-in-gate.tsx`    | Connects with the studio key before the picker offers to sign in.    |
 | `src/use-studio-key.ts`          | Reads and writes that key in its `secrets.raster` document.          |
 | `src/studio-key-setup.tsx`       | Where an administrator saves or removes it, in the tool.             |

@@ -27,45 +27,62 @@ export function useStudioKey(): StudioKey {
 	return studioKey
 }
 
+// Per scope (see `rasterScope`), read once per page like the client it picks, so reopening the
+// picker doesn't wait on it. A failed read isn't kept, so the next open reads again.
+const savedKeys = new Map<string, string | null>()
+
 /** Reads and writes the API key an admin saved for the studio, or for its pinned organization. */
-export function useStudioKeyDocument(orgId: string | undefined): StudioKey {
+export function useStudioKeyDocument(scope: string, orgId: string | undefined): StudioKey {
 	/** Context */
 	const client = useClient({ apiVersion: '2025-01-01' })
 
 	/** State */
-	const [key, setKey] = useState<string | null | undefined>(undefined)
+	const [read, setRead] = useState<{ scope: string; key: string | null } | null>(null)
 
 	/** Derived */
 	const id = secretsId(orgId)
+	const key = savedKeys.has(scope)
+		? savedKeys.get(scope)
+		: read?.scope === scope
+			? read.key
+			: undefined
 
 	/** Handlers */
+	function remember(next: string | null) {
+		savedKeys.set(scope, next)
+		setRead({ scope, key: next })
+	}
+
 	async function save(next: string) {
 		await client.createOrReplace({ _id: id, _type: 'rasterSecrets', apiKey: next })
-		setKey(next)
+		remember(next)
 	}
 
 	async function remove() {
 		await client.delete(id)
-		setKey(null)
+		remember(null)
 	}
 
 	/** Effects */
 	useEffect(() => {
+		if (savedKeys.has(scope)) return
 		let cancelled = false
 		client.getDocument<SecretsDocument>(id).then(
 			(document) => {
-				if (!cancelled) setKey(document?.apiKey || null)
+				const next = document?.apiKey || null
+				savedKeys.set(scope, next)
+				if (!cancelled) setRead({ scope, key: next })
 			},
 			(caught: unknown) => {
 				// Unreadable counts as unsaved, so editors can still sign in themselves.
 				console.error(caught)
-				if (!cancelled) setKey(null)
+				if (!cancelled) setRead({ scope, key: null })
 			}
 		)
 		return () => {
 			cancelled = true
 		}
-	}, [client, id])
+	}, [client, id, scope])
 
 	return { key, save, remove }
 }

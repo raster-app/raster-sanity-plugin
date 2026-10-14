@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { RasterProvider } from '@raster-app/react'
 import { useWorkspace } from 'sanity'
-import { getRasterClient } from './client'
+import { getRasterClient, rasterScope } from './client'
 import { LoadingState } from './loading-state'
 import type { RasterConfig } from './types'
 import { StudioKeyProvider, useStudioKeyDocument } from './use-studio-key'
@@ -14,19 +14,19 @@ export function RasterStudioProvider({
 	config: RasterConfig
 	children: ReactNode
 }) {
-	const workspace = useWorkspace().name
-	const studioKey = useStudioKeyDocument(config.orgId)
+	const workspace = useWorkspace()
+	const scope = rasterScope(workspace, config.orgId)
+	const studioKey = useStudioKeyDocument(scope, config.orgId)
 
-	// Which credential store the client gets depends on whether a key is saved.
+	// Until the key is read, the picker would offer to sign in before the gate can connect it.
 	if (studioKey.key === undefined) return <LoadingState label="Connecting to Raster…" />
 
-	const hasStudioKey = studioKey.key !== null
-	const { client, state } = getRasterClient(workspace, config.orgId, hasStudioKey)
+	const { client, state, queryClient } = getRasterClient(scope)
 
 	return (
 		<StudioKeyProvider value={studioKey}>
-			{/* The provider keeps the client it mounted with, so saving or removing a key remounts it. */}
-			<RasterProvider key={hasStudioKey ? 'studio-key' : 'session'} client={client} state={state}>
+			{/* The provider keeps the client it mounted with, so another scope remounts it. */}
+			<RasterProvider key={scope} client={client} state={state} queryClient={queryClient}>
 				{children}
 			</RasterProvider>
 		</StudioKeyProvider>

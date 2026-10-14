@@ -45,7 +45,8 @@
 	},
 	"dependencies": {
 		"@raster-app/react": "0.1.0",
-		"@sanity/icons": "^3.7.4 || ^5.2.2"
+		"@sanity/icons": "^3.7.4 || ^5.2.2",
+		"@tanstack/react-query": "^5.103.1"
 	},
 	"peerDependencies": {
 		"@sanity/ui": "^3.0.0 || ^4.0.0",
