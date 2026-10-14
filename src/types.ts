@@ -1,23 +1,14 @@
-import { type AssetSourceComponentProps } from "sanity";
+import type { AssetSourceComponentProps } from 'sanity'
 
 export interface RasterConfig {
-  apiKey: string;
-  orgId: string;
+	/** Pin the plugin to one organization: a sign-in that grants any other fails. */
+	orgId?: string
 }
 
 export interface RasterAssetSourceProps extends AssetSourceComponentProps {
-  config: RasterConfig;
+	config: RasterConfig
 }
 
 export interface RasterToolProps {
-  config: RasterConfig;
-}
-
-export interface RasterImage {
-  url: string;
-  filename: string;
-  size?: number;
-  width?: number;
-  height?: number;
-  mimeType?: string;
+	config: RasterConfig
 }
