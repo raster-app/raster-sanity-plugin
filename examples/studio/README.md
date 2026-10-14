@@ -57,7 +57,8 @@ dataset with the Sanity CLI, which needs `pnpm exec sanity login` once.
    Raster, and `description` is there only when the asset has one.
 10. Open an asset with versions, choose a variant and Pick asset: the query shows the original's
     id in `source.id`, and `source.url` opens the variant.
-11. Pick a video or a PDF: "Only images can be used in this field.", and the picker stays open.
+11. Pick a video: "Only images can be used in this field.", and the picker stays open. A PDF
+    can't be picked at all.
     Open the organization switcher and press Escape: only the menu closes.
 
 **The tool**

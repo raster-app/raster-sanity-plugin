@@ -18,8 +18,8 @@ config carrying an API key.
   search across an organization or one library, an asset's versions with setting one as the
   default, and uploads by button or drag-and-drop, as a new asset or as a variant.
 - **Follows the Studio's light or dark scheme.**
-- The picker lists videos and PDFs too. Picking one into an image field says that only images
-  can be used, and leaves the picker open.
+- The picker lists videos and PDFs too. Picking a video into an image field, or an image in a
+  format the field's `accept` option leaves out, says why and leaves the picker open.
 
 ### Breaking changes
 

@@ -167,8 +167,9 @@ the image pipeline, GROQ projections, `next-sanity-image` — works unchanged:
 Raster>" }`. That is what gets an editor from an image in a document back to the asset it came
 from.
 
-The picker lists every asset in a library, videos and PDFs included. Picking one of those into
-an image field says that only images can be used, and leaves the picker open.
+The picker lists every asset in a library, videos and PDFs included. Picking a video into an
+image field, or an image in a format the field's `accept` option leaves out, says why and leaves
+the picker open, where Sanity would otherwise drop it without a word.
 
 ### Setting a default version
 

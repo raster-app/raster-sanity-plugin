@@ -3,21 +3,46 @@ import { getFullSizeUrl, type Asset } from '@raster-app/react'
 import { Box, Card, Dialog, Text } from '@sanity/ui'
 import type { AssetFromSource } from 'sanity'
 import { RasterStudioPicker } from './raster-studio-picker'
-import { isImage, type RasterAssetSourceProps } from './types'
+import type { RasterAssetSourceProps } from './types'
+
+const UNTYPED = 'Raster has no file type for this asset, so this field cannot take it.'
+const NO_FILE = 'Raster has no file for this asset yet.'
+
+/** Sanity's own test of a file against an `accept` list, which `sanity` does not export. */
+function accepts(type: string, name: string, accept: string): boolean {
+	if (!accept) return true
+	const mimeType = type.toLowerCase()
+	return accept.split(',').some((entry) => {
+		const token = entry.trim().toLowerCase()
+		if (token.startsWith('.')) return name === '' || name.toLowerCase().endsWith(token)
+		if (token.endsWith('/*')) return mimeType.replace(/\/.*$/, '') === token.replace(/\/.*$/, '')
+		return mimeType === token
+	})
+}
+
+/** Why the field would not take the asset, as Sanity would judge the file it fetches; or null. */
+function whyRefused(asset: Asset, accept: string): string | null {
+	const name = asset.name ?? ''
+	// Some variant rows carry no type of their own. A variant shares its original's kind, so it
+	// is taken as an image of an unrecorded format, which fits only a field that takes any image.
+	const type = asset.contentType ?? (asset.parentId === null ? null : 'image/*')
+	if (type === null) return UNTYPED
+	if (!accepts(type, name, 'image/*')) return 'Only images can be used in this field.'
+	if (accepts(type, name, accept)) return null
+	return asset.contentType ? `This field only accepts ${accept}.` : UNTYPED
+}
 
 /** The Raster picker, as an image field's asset source. */
 export function RasterAssetSource(props: RasterAssetSourceProps) {
-	const { config, onSelect, onClose, dialogHeaderTitle } = props
-	const [refused, setRefused] = useState(false)
+	const { config, accept, onSelect, onClose, dialogHeaderTitle } = props
+	const [refused, setRefused] = useState<string | null>(null)
 
 	function handlePick(asset: Asset) {
-		// Sanity would only fail on it after the dialog has closed.
-		if (!isImage(asset)) {
-			setRefused(true)
-			return
-		}
 		const url = getFullSizeUrl(asset)
-		if (url === null) return
+		// Sanity would only drop it after the dialog has closed, and without a word.
+		const reason = whyRefused(asset, accept) ?? (url === null ? NO_FILE : null)
+		setRefused(reason)
+		if (reason !== null || url === null) return
 
 		const picked: AssetFromSource = {
 			kind: 'url',
@@ -50,11 +75,11 @@ export function RasterAssetSource(props: RasterAssetSourceProps) {
 			position="fixed"
 			zOffset={99999999}
 			footer={
-				refused ? (
+				refused === null ? undefined : (
 					<Card tone="caution" padding={3} role="alert">
-						<Text size={1}>Only images can be used in this field.</Text>
+						<Text size={1}>{refused}</Text>
 					</Card>
-				) : undefined
+				)
 			}
 		>
 			{/* The dialog sizes to its content, and the picker needs a fixed height to scroll in. */}
