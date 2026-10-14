@@ -6,7 +6,14 @@ import { verifyApiKey } from './client'
 import { useStudioKey } from './use-studio-key'
 
 /** Lets an administrator save or remove the API key used for everyone in this studio. */
-export function StudioKeySetup({ orgId }: { orgId: string | undefined }) {
+export function StudioKeySetup({
+	orgId,
+	onChange,
+}: {
+	orgId: string | undefined
+	/** After the key is saved or removed, even when saved unchanged. */
+	onChange: () => void
+}) {
 	/** Context */
 	const studioKey = useStudioKey()
 	const user = useCurrentUser()
@@ -28,6 +35,7 @@ export function StudioKeySetup({ orgId }: { orgId: string | undefined }) {
 			await verifyApiKey(apiKey, orgId)
 			await studioKey.save(apiKey)
 			setDraft('')
+			onChange()
 		} catch (caught) {
 			console.error(caught)
 			setError(toUserMessage(caught))
@@ -41,6 +49,7 @@ export function StudioKeySetup({ orgId }: { orgId: string | undefined }) {
 		setError(null)
 		try {
 			await studioKey.remove()
+			onChange()
 		} catch (caught) {
 			console.error(caught)
 			setError(toUserMessage(caught))

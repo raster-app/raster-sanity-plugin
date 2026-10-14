@@ -44,7 +44,8 @@ dataset with the Sanity CLI, which needs `pnpm exec sanity login` once.
 6. Above the sign-in, "Connect everyone with an API key": save a wrong key and it is refused and
    not saved. Save the right one: the picker connects. Reload, and open the Studio in a private
    window: both connect without signing in to Raster.
-7. Sign out: the sign-in shows, saying a key is saved, and the key stays unused until a reload.
+7. Sign out: the sign-in shows, saying a key is saved, and the key stays unused until a reload
+   or until an admin saves it again.
    Revoke the key in Raster and reload: "The API key saved for this studio was refused: …".
 8. Remove saved key, and reload: signed out.
 
