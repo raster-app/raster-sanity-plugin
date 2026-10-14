@@ -67,6 +67,8 @@ export function StudioKeySetup({ orgId }: { orgId: string | undefined }) {
 				</Text>
 				<TextInput
 					type="password"
+					// Browsers ignore `off` on a password field and fill in a saved password.
+					autoComplete="new-password"
 					value={draft}
 					placeholder="Organization API key"
 					onChange={(event) => setDraft(event.currentTarget.value)}

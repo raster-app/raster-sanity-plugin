@@ -121,6 +121,10 @@ from your team, though:
 So create the key for this Studio alone, with access to only the libraries it needs. With
 `orgId` set, the key must belong to that organization; a key for another is refused.
 
+Only administrators see the setup in the Raster tool, but anyone who can edit documents can
+also replace or remove the key. Pinning `orgId` limits a replacement to keys of that
+organization, and custom roles can restrict who may edit it.
+
 ### Where the session is stored
 
 The credential is kept in `localStorage`, per browser, Studio workspace and pinned

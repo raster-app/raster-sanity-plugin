@@ -4,7 +4,7 @@ import { RasterAssetSource } from './raster-asset-source'
 import { RasterTool } from './raster-tool'
 import type { RasterConfig } from './types'
 
-export * from './types'
+export type { RasterAssetSourceProps, RasterConfig, RasterToolProps } from './types'
 
 /** Adds Raster as an asset source on every image field, and a Raster tool. */
 // biome-ignore lint/suspicious/noConfusingVoidType: `void` is what makes the argument optional, so `rasterPlugin()` works.
