@@ -1,10 +1,11 @@
 import {
+	connectApiKey,
 	type CredentialStore,
 	createRasterClient,
+	getMe,
 	localStorageCredentialStore,
 	localStorageStateStore,
 	type Me,
-	meCredentialOrganizations,
 	memoryCredentialStore,
 	RasterApiError,
 	type RasterClient,
@@ -85,7 +86,7 @@ export function getRasterClient(scope: string): {
 }
 
 /**
- * `auth.connect` can't bind a key to an organization, so a pinned studio checks the one the
+ * `connectApiKey` can't bind a key to an organization, so a pinned studio checks the one the
  * key reaches before anything adopts it.
  */
 async function checkKey(
@@ -93,7 +94,7 @@ async function checkKey(
 	apiKey: string,
 	orgId: string | undefined
 ): Promise<Me> {
-	const me = await client.me(apiKey)
+	const me = await getMe(client, { bearer: apiKey })
 	if (orgId === undefined || ('organizationId' in me && me.organizationId === orgId)) return me
 	throw new RasterApiError(
 		`That key is for another Raster organization than ${orgId}.`,
@@ -109,16 +110,9 @@ export async function connectStudioKey(
 	orgId: string | undefined
 ): Promise<void> {
 	const key = apiKey.trim()
-	const me = await checkKey(client, key, orgId)
-	const { clientId } = client.session.current() ?? (await client.session.hydrate())
+	if (orgId !== undefined) await checkKey(client, key, orgId)
 	studioKeys.add(key)
-	await client.session.save({
-		clientId,
-		apiKey: key,
-		oauth: null,
-		userName: null,
-		organizations: meCredentialOrganizations(me),
-	})
+	await connectApiKey(client, { apiKey: key })
 }
 
 /** Checks a key with Raster without storing it anywhere. */
