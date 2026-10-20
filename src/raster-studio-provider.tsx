@@ -18,7 +18,7 @@ export function RasterStudioProvider({
 	const scope = rasterScope(workspace, config.orgId)
 	const studioKey = useStudioKeyDocument(scope, config.orgId)
 
-	// Until the key is read, the picker would offer to sign in before the gate can connect it.
+	// Until the key is read, the picker would offer to sign in before it can connect the key.
 	if (studioKey.key === undefined) return <LoadingState label="Connecting to Raster…" />
 
 	const { client, state, queryClient } = getRasterClient(scope)

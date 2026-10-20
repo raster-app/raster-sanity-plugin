@@ -221,11 +221,10 @@ pnpm install
 | `src/index.tsx`                  | The plugin: the asset source and the tool.                           |
 | `src/raster-asset-source.tsx`    | The picker in a dialog, handing Sanity the picked image.             |
 | `src/raster-tool.tsx`            | The picker in a pane, for browsing.                                  |
-| `src/raster-studio-picker.tsx`   | `RasterPicker` with its stylesheet and the Studio's color scheme.    |
+| `src/raster-studio-picker.tsx`   | `RasterPicker` with its stylesheet, color scheme and the studio key. |
 | `src/raster-studio-provider.tsx` | The workspace's client, for `RasterPicker`.                          |
 | `src/client.ts`                  | One `RasterClient` per project, dataset, workspace and pinned org.   |
-| `src/raster-sign-in-gate.tsx`    | Connects with the studio key before the picker offers to sign in.    |
-| `src/use-studio-key.ts`          | Reads and writes that key in its `secrets.raster` document.          |
+| `src/use-studio-key.ts`          | Reads and writes the studio key in its `secrets.raster` document.    |
 | `src/studio-key-setup.tsx`       | Where an administrator saves or removes it, in the tool.             |
 | `src/loading-state.tsx`          | A spinner with a label.                                              |
 

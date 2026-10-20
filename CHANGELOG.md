@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.1.0
+
+Moves to [`@raster-app/react`](https://www.npmjs.com/package/@raster-app/react) `0.2.0`, which
+calls the SDK as standalone functions and connects a shared API key itself.
+
+### Changed
+
+- **The studio's API key is connected by the picker.** `RasterPicker` now takes the saved key and
+  connects it in memory only, as the plugin did by hand. The key is still saved in the
+  `secrets.raster` document and set up the same way in the Raster tool.
+- A refused studio key now shows on the picker's sign-in, as "That API key was not accepted…",
+  and a key for another organization than `orgId` as "That API key is for another Raster
+  organization than the one this app uses."
+- After an editor signs out, saving the same key again no longer reconnects it until a reload.
+  Saving another key does.
+
+### Migrating from 2.0.0
+
+Nothing to change. Saved keys and sign-ins carry over.
+
 ## 2.0.0
 
 A rewrite on Raster's drop-in picker, [`@raster-app/react`](https://www.npmjs.com/package/@raster-app/react)

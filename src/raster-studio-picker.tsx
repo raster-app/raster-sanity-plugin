@@ -1,10 +1,12 @@
 import { useInsertionEffect } from 'react'
-import { RasterPicker, type Asset } from '@raster-app/react'
+import { RasterPicker, useSession, type Asset } from '@raster-app/react'
 import styles from '@raster-app/react/styles.css?inline'
+import { Box, Flex } from '@sanity/ui'
 import { useColorSchemeValue } from 'sanity'
-import { RasterSignInGate } from './raster-sign-in-gate'
 import { RasterStudioProvider } from './raster-studio-provider'
+import { StudioKeySetup } from './studio-key-setup'
 import type { RasterConfig } from './types'
+import { useStudioKey } from './use-studio-key'
 
 const STYLE_ELEMENT_ID = 'raster-sanity-plugin-styles'
 
@@ -27,7 +29,7 @@ function useRasterStyles(): void {
 export function RasterStudioPicker({
 	config,
 	onPick,
-	allowStudioKeySetup,
+	allowStudioKeySetup = false,
 }: {
 	config: RasterConfig
 	/** Without it, the picker only browses. */
@@ -36,18 +38,45 @@ export function RasterStudioPicker({
 	allowStudioKeySetup?: boolean
 }) {
 	useRasterStyles()
-	const scheme = useColorSchemeValue()
 
 	return (
 		<RasterStudioProvider config={config}>
-			<RasterSignInGate orgId={config.orgId} allowStudioKeySetup={allowStudioKeySetup}>
+			<StudioPicker config={config} onPick={onPick} allowStudioKeySetup={allowStudioKeySetup} />
+		</RasterStudioProvider>
+	)
+}
+
+/** Connects with the key saved for the studio, and lets an admin save one while signed out. */
+function StudioPicker({
+	config,
+	onPick,
+	allowStudioKeySetup,
+}: {
+	config: RasterConfig
+	onPick?: (asset: Asset) => void
+	allowStudioKeySetup: boolean
+}) {
+	/** Context */
+	const scheme = useColorSchemeValue()
+	const studioKey = useStudioKey()
+	const { credentials, isConfigured } = useSession()
+
+	/** Derived */
+	const isSignedOut = credentials !== undefined && !isConfigured
+
+	return (
+		<Flex direction="column" gap={3} style={{ height: '100%', minHeight: 0 }}>
+			{isSignedOut && allowStudioKeySetup && <StudioKeySetup orgId={config.orgId} />}
+
+			<Box flex={1} style={{ minHeight: 0 }}>
 				<RasterPicker
 					organizationId={config.orgId}
+					apiKey={studioKey.key ?? undefined}
 					onPick={onPick}
 					onError={console.error}
 					theme={scheme}
 				/>
-			</RasterSignInGate>
-		</RasterStudioProvider>
+			</Box>
+		</Flex>
 	)
 }

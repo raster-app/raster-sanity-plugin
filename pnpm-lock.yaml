@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@raster-app/react':
-        specifier: 0.2.0-canary-846559b
-        version: 0.2.0-canary-846559b(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        specifier: 0.2.0
+        version: 0.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@sanity/icons':
         specifier: ^3.7.4 || ^5.2.2
         version: 5.2.2(react@19.3.0)
@@ -2256,14 +2256,14 @@ packages:
     resolution: {integrity: sha512-djfIGU9n6DRrunlvj2nIDAp17URo/nA4jSXGvf+Gupx8NLLy9fmJBZ3GL8yhqn9lSVc+cKCharjOa3aOBnWbRw==}
     engines: {node: '>=20.19 <22 || >=22.12'}
 
-  '@raster-app/react@0.2.0-canary-846559b':
-    resolution: {integrity: sha512-uAZg0OMw0At4tlUtO8wDWYYMNnxF4VX4YB560mrLTRcqn7OCA/m6P4J4BCohpDtXcuIHZWSal0sICSQbdYEFtQ==}
+  '@raster-app/react@0.2.0':
+    resolution: {integrity: sha512-L5RYVlmJf+Md8GtE7vke+aUdUspffQIH0gei0VZ73IJ9sP3Z/3qMHrR3NcQekSVNpiDFOyHvVdOYXPGIdObWog==}
     engines: {node: '>=22.12'}
     peerDependencies:
       react: ^18 || ^19
 
-  '@raster-app/sdk@0.2.0-canary-846559b':
-    resolution: {integrity: sha512-wTh6JANuAE9a5Dtjh6kNqWfqOXNo88SWLZu90WvUp9rzKIxnaQunxHyyP9De159zeKFnBEsq2MmP4JrjkkZEPg==}
+  '@raster-app/sdk@0.2.0':
+    resolution: {integrity: sha512-a9G6C6FSERQAmVRpUsjUmDRrioSxpQUGV4nwLk/cFT+/W/DUGrG8ES317IN3xAOUUFXElb6jLcoiOwR4VCm9Xg==}
     engines: {node: '>=22.12'}
 
   '@rexxars/choosealicense-list@1.1.2':
@@ -9763,16 +9763,16 @@ snapshots:
 
   '@portabletext/types@4.0.2': {}
 
-  '@raster-app/react@0.2.0-canary-846559b(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@raster-app/react@0.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
-      '@raster-app/sdk': 0.2.0-canary-846559b
+      '@raster-app/sdk': 0.2.0
       '@tanstack/react-query': 5.103.2(react@19.3.0)
       '@tanstack/react-virtual': 3.14.13(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react: 19.3.0
     transitivePeerDependencies:
       - react-dom
 
-  '@raster-app/sdk@0.2.0-canary-846559b': {}
+  '@raster-app/sdk@0.2.0': {}
 
   '@rexxars/choosealicense-list@1.1.2': {}
 
