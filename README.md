@@ -1,75 +1,21 @@
 # Sanity Plugin - Raster
 
 A Sanity Studio plugin for [Raster](https://raster.app), a digital asset management platform.
-Browse your Raster organizations, libraries and variants from inside Studio, and pick images
-straight into any image field.
+Browse, search and upload Raster assets from Studio, and pick them into any image field.
 
-Built on [`@raster-app/react`](https://www.npmjs.com/package/@raster-app/react), Raster's
-drop-in asset picker: the same sign-in, browsing and uploads as Raster's other plugins, drawn as
-Raster draws them. See the [SDK docs](https://raster.app/docs/api/sdk) for the picker itself.
+[![The Raster picker in a Sanity image field](https://rstr.in/raster/changelog/8HCzGrVc8wM-1080)](https://raster.app/docs/integrations/sanity)
 
-## Features
-
-- **Asset source on every image field** — pick an image from Raster without leaving the
-  document, and the Raster asset's id and app link are recorded on the Sanity asset.
-- **A Raster tool** for browsing libraries on their own, with the whole pane to work in.
-- **Sign in from inside Studio** with the device code flow, or connect everyone with an
-  organization API key an admin saves once. No credentials in your Studio config.
-- **Organization switcher** for a credential that reaches more than one.
-- **Full-text search** across an organization, or narrowed to the open library.
-- **Versions** — browse an asset's variants, and set one as the default.
-- **Upload** by button or drag-and-drop, as a new asset or as a variant of an existing one.
-- **Follows the Studio's light or dark scheme.**
+**[Read the docs](https://raster.app/docs/integrations/sanity)** for signing in, picking,
+browsing, uploads and upgrading from 1.x. Built on
+[`@raster-app/react`](https://raster.app/docs/api/sdk).
 
 ## Installation
 
-With npm:
+Needs Sanity Studio 4.2 or later, React 19 and Node.js 22.12 or later.
 
 ```bash
 npm install @raster-app/sanity-plugin-raster
 ```
-
-Or with pnpm:
-
-```bash
-pnpm add @raster-app/sanity-plugin-raster
-```
-
-## Compatibility
-
-| | Supported |
-| --- | --- |
-| `sanity` | 4.2 or later, 5.x, 6.x |
-| `@sanity/ui` | 3.x, 4.x |
-| `react` | 19 |
-| Node.js | 22.12 or later |
-
-`@sanity/ui` is a **peer dependency**, not a dependency — it carries the Studio's theme through
-React context, and a second copy means a component that cannot read it. Every supported studio
-already has it by way of `sanity`, so there is nothing to install. Sanity 4.0 and 4.1 ship
-`@sanity/ui` 2.x, which is why the plugin needs 4.2.
-
-The plugin only uses what the package root exports in both 3.x and 4.x: `Box`, `Button`,
-`Card`, `Dialog`, `Flex`, `Spinner`, `Text` and `TextInput`, laid out with `Flex`'s `gap`, which
-both versions accept. Some things are avoided on purpose:
-
-- **`Stack` and `Inline`**, whose spacing prop was renamed `space` → `gap` between 3.0 and 4.0
-  with no spelling valid in both. `<Flex direction="column" gap={3}>` does the same job.
-- **`MenuButton`, `Menu`, `Breadcrumbs`, `Tooltip`, `Popover`, `Code` and `useToast`**, which
-  4.x moved to subpaths that 3.x does not have.
-
-## Upgrading from 1.x
-
-2.0.0 needs Sanity 4.2 or later; stay on 1.0.14 for Sanity v3. Then:
-
-1. Remove `apiKey` from `rasterPlugin(...)`. Left in, it only logs a warning.
-2. Either let editors sign in with their own Raster accounts, or have an administrator save an
-   organization API key in the Raster tool (see [An API key for everyone](#an-api-key-for-everyone)).
-3. Replace any import of the `RasterImage` type with `Asset` from `@raster-app/react`.
-
-Documents need no changes. The [changelog](CHANGELOG.md#200) has the full list.
-
-## Setup
 
 ```typescript
 // sanity.config.ts
@@ -82,112 +28,25 @@ export default defineConfig({
 });
 ```
 
-That is the whole setup. The first time an editor opens the Raster tool or picker they are
-asked to connect their Raster account; the session is then remembered in that browser.
+Pass `rasterPlugin({ orgId: "acme" })` to pin it to one organization: a sign-in or key for any
+other is refused.
 
-### Configuration
-
-The only option is optional:
-
-```typescript
-rasterPlugin({
-  // Pin the plugin to one organization: a sign-in that grants any other fails.
-  orgId: "acme",
-});
-```
-
-A pinned plugin keeps its sign-ins apart from an unpinned one, so pinning it, or changing the
-pin, asks editors to sign in again. Editors can't connect an API key of their own while it is
-pinned.
+## Security
 
 ### An API key for everyone
 
-Instead of having each editor sign in, an administrator can save an organization API key in
-the Raster tool: sign out if needed, and use **Connect everyone with an API key** on the
-sign-in screen. Editors are then connected without signing in. The key is read on every load
-and kept in memory rather than in editors' browsers, so a rotated key takes effect on the next
-load.
-
-The key is stored in the dataset, in a document with the id `secrets.raster`, or
-`secrets.raster.<orgId>` when the plugin is pinned, so workspaces pinned to different
-organizations keep their own key. Sanity only returns documents with a dot in their id to
-signed-in users, so it is not public and does not ship in the Studio bundle. It is not hidden
-from your team, though:
-
-- **Anyone signed in to the Studio who can read documents can read the key.** Custom roles,
-  available on Enterprise plans, can limit that.
-- **Dataset exports include it.**
-
-So create the key for this Studio alone, with access to only the libraries it needs. With
-`orgId` set, the key must belong to that organization; a key for another is refused.
-
-Only administrators see the setup in the Raster tool, but anyone who can edit documents can
-also replace or remove the key. Pinning `orgId` limits a replacement to keys of that
-organization, and custom roles can restrict who may edit it.
+The key an administrator saves under **Connect everyone with an API key** is stored in the
+dataset, in the document `secrets.raster` (or `secrets.raster.<orgId>` when pinned), and kept in
+memory in editors' browsers, never stored there. Sanity only returns it to signed-in users, but
+**anyone who can read documents can read the key, and dataset exports include it**. Create a key
+for this Studio alone, with access to only the libraries it needs.
 
 ### Where the session is stored
 
-The credential is kept in `localStorage`, per browser, project, dataset, workspace and pinned
-organization, so editors sign in once rather than on every reload. It also means **any script
-or plugin running on the Studio's origin can read the token** — the usual trade for an admin UI,
-but worth making deliberately. Signing out clears it and asks Raster to revoke a signed-in
-session, which an editor can also revoke in Raster under **Settings > Connected apps**. An
-organization API key an editor connects in the picker is stored the same way; signing out only
-forgets it, so revoke it in Raster under **Organization settings > API keys**. The key saved for
-the studio is never stored there. An editor who signs in themselves keeps that session when a
-key is saved for the studio, and is connected with the studio's key from the next load after
-they sign out.
-
-## Usage
-
-The plugin adds itself to every `image` field, so no schema changes are needed:
-
-```typescript
-// schemas/blogPost.ts
-import { defineType } from "sanity";
-
-export default defineType({
-  name: "blogPost",
-  title: "Blog Post",
-  type: "document",
-  fields: [
-    { name: "title", type: "string", validation: (Rule) => Rule.required() },
-    { name: "featuredImage", type: "image", title: "Featured Image" },
-  ],
-});
-```
-
-Choosing "Raster" in the field's source menu opens the picker. Sanity fetches the chosen image
-and stores it as a normal `sanity.imageAsset`, so everything downstream — hotspot and crop,
-the image pipeline, GROQ projections, `next-sanity-image` — works unchanged:
-
-```groq
-*[_type == "blogPost"][0]{
-  title,
-  featuredImage{
-    asset->{ url, originalFilename, source }
-  }
-}
-```
-
-`source` carries the provenance: `{ name: "raster", id: "<raster asset id>", url: "<link into
-Raster>" }`. That is what gets an editor from an image in a document back to the asset it came
-from.
-
-The picker lists every asset in a library, videos and PDFs included. Picking a video into an
-image field, or an image in a format the field's `accept` option leaves out, says why and leaves
-the picker open, where Sanity would otherwise drop it without a word.
-
-### Setting a default version
-
-Sanity keeps the file it copied when the image was picked. Setting another version as the
-default in Raster doesn't change documents; to update one, pick the image again.
+An editor's own sign-in is kept in `localStorage`, so **any script on the Studio's origin can
+read it**. Signing out clears it and revokes a signed-in session in Raster.
 
 ## Development
-
-The plugin is built on [`@raster-app/react`](https://www.npmjs.com/package/@raster-app/react),
-which carries the SDK's client, its hooks and `RasterPicker`. What the plugin adds is Sanity's
-side: the asset source, the tool, the key saved for the studio, and the picker's stylesheet.
 
 ```bash
 pnpm install
@@ -196,62 +55,16 @@ pnpm check
 pnpm build
 ```
 
-`pnpm check` runs Biome's formatter and linter, applying safe fixes.
+[`examples/studio`](examples/studio) is a Studio that loads the plugin from `src/`, with the
+manual QA checklist in its README.
 
-[`examples/studio`](examples/studio) is a Studio that loads the plugin from `src/`, for trying it
-by hand. Its README holds the setup and the manual QA checklist.
-
-To try the built plugin in another Studio, run this in the plugin directory:
-
-```bash
-pnpm link-watch
-```
-
-Then, in your Studio's directory:
+To try the built plugin in another Studio, run `pnpm link-watch` here, then in that Studio:
 
 ```bash
 pnpm yalc add @raster-app/sanity-plugin-raster
 pnpm install
 ```
 
-### How the pieces fit
-
-| File                             | What it does                                                         |
-| -------------------------------- | -------------------------------------------------------------------- |
-| `src/index.tsx`                  | The plugin: the asset source and the tool.                           |
-| `src/raster-asset-source.tsx`    | The picker in a dialog, handing Sanity the picked image.             |
-| `src/raster-tool.tsx`            | The picker in a pane, for browsing.                                  |
-| `src/raster-studio-picker.tsx`   | `RasterPicker` with its stylesheet, color scheme and the studio key. |
-| `src/raster-studio-provider.tsx` | The workspace's client, for `RasterPicker`.                          |
-| `src/client.ts`                  | One `RasterClient` per project, dataset, workspace and pinned org.   |
-| `src/use-studio-key.ts`          | Reads and writes the studio key in its `secrets.raster` document.    |
-| `src/studio-key-setup.tsx`       | Where an administrator saves or removes it, in the tool.             |
-| `src/loading-state.tsx`          | A spinner with a label.                                              |
-
-The picker's stylesheet, `@raster-app/react/styles.css`, is inlined into the build and added to
-the page the first time the picker renders, since a Studio can't be asked to import a plugin's
-CSS. Its rules are scoped under `.rs`.
-
-## Contributing
-
-Contributions are welcome.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes
-4. Open a Pull Request
-
 ## License
 
 MIT © Monogram Inc.
-
-## Support
-
-- 📝 [Documentation](https://docs.raster.app)
-- 📧 [Email Support](mailto:support@raster.app)
-
----
-
-<div align="center">
-Made with ❤️ by <a href="https://monogram.io">Monogram</a>
-</div>
