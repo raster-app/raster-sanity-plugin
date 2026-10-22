@@ -33,9 +33,9 @@ dataset with the Sanity CLI, which needs `pnpm exec sanity login` once.
    it.
 4. Still pinned, sign out and grant another organization: "That sign-in doesn’t match the Raster
    organization this app uses. Sign in again and choose that organization." Save a key from
-   another organization under "Connect everyone with an API key": "That key is for another
-   Raster organization than …". Empty the variable and restart: the sign-in from step 2 is still
-   there.
+   another organization under "Connect everyone with an API key": "That API key is for another
+   Raster organization than the one this app uses." Empty the variable and restart: the sign-in
+   from step 2 is still there.
 
 **API keys**, unpinned
 
@@ -45,8 +45,8 @@ dataset with the Sanity CLI, which needs `pnpm exec sanity login` once.
    not saved. Save the right one: the picker connects. Reload, and open the Studio in a private
    window: both connect without signing in to Raster.
 7. Sign out: the sign-in shows, saying a key is saved, and the key stays unused until a reload
-   or until an admin saves it again.
-   Revoke the key in Raster and reload: "The API key saved for this studio was refused: …".
+   or until an admin saves another.
+   Revoke the key in Raster and reload: the sign-in shows "That API key was not accepted…".
 8. Remove saved key, and reload: signed out.
 
 **Picking into an image field**

@@ -1,7 +1,7 @@
 {
 	"name": "@raster-app/sanity-plugin-raster",
 	"private": false,
-	"version": "2.0.0",
+	"version": "2.1.0",
 	"type": "module",
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.js",
@@ -44,7 +44,7 @@
 		"check": "biome check --write ."
 	},
 	"dependencies": {
-		"@raster-app/react": "0.1.0",
+		"@raster-app/react": "0.2.0",
 		"@sanity/icons": "^3.7.4 || ^5.2.2",
 		"@tanstack/react-query": "^5.103.1"
 	},
