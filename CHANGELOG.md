@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.1
+
+- The README is shorter, with a screenshot, and points to the
+  [docs](https://raster.app/docs/integrations/sanity) for using the plugin. No code changes.
+
 ## 2.1.0
 
 Moves to [`@raster-app/react`](https://www.npmjs.com/package/@raster-app/react) `0.2.0`, which
