@@ -1,13 +1,13 @@
 import { useState } from 'react'
-import { toUserMessage } from '@raster-app/react'
+import { checkApiKey, toUserMessage, useRasterClient } from '@raster-app/react'
 import { Button, Card, Flex, Text, TextInput } from '@sanity/ui'
 import { useCurrentUser } from 'sanity'
-import { verifyApiKey } from './client'
 import { useStudioKey } from './use-studio-key'
 
 /** Lets an administrator save or remove the API key used for everyone in this studio. */
 export function StudioKeySetup({ orgId }: { orgId: string | undefined }) {
 	/** Context */
+	const raster = useRasterClient()
 	const studioKey = useStudioKey()
 	const user = useCurrentUser()
 
@@ -25,7 +25,7 @@ export function StudioKeySetup({ orgId }: { orgId: string | undefined }) {
 		setStatus('saving')
 		setError(null)
 		try {
-			await verifyApiKey(apiKey, orgId)
+			await checkApiKey(raster, { apiKey, organizationId: orgId })
 			await studioKey.save(apiKey)
 			setDraft('')
 		} catch (caught) {

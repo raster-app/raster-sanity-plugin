@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.1.2
+
+Moves to [`@raster-app/react`](https://www.npmjs.com/package/@raster-app/react) `0.2.1`.
+
+- An uploading video previews as a video, and an opened one plays, in place of a broken image.
+- A file over 32 MB is refused before it uploads, with a link to open Raster.
+- The plugin uses the SDK's `scopedRaster` and `checkApiKey` in place of its own copies, and no
+  longer depends on `@tanstack/react-query` directly. Saved keys and sign-ins carry over.
+
 ## 2.1.1
 
 - The README is shorter, with a screenshot, and points to the

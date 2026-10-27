@@ -29,7 +29,6 @@ export default defineConfig({
 				'@sanity/ui',
 				'@sanity/icons',
 				'@raster-app/react',
-				'@tanstack/react-query',
 			],
 			output: [
 				{
