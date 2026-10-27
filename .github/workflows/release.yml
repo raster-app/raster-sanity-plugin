@@ -25,7 +25,9 @@ jobs:
       # Trusted publishing (OIDC) needs npm 11.5.1 or later.
       - run: npm install -g npm@latest pnpm@12.6.0
 
-      - run: pnpm install --frozen-lockfile
+      # No dependency scripts in a job that can publish. esbuild runs without its postinstall, and
+      # pnpm fails a fresh install on the build it would otherwise skip.
+      - run: pnpm install --frozen-lockfile --ignore-scripts
 
       # prepublishOnly builds it. The repo is public, so npm adds provenance.
       - run: npm publish
